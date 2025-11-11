@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { getFinancialStats, getAllTransactions, type FinancialStats, type FinancialTransaction } from "@/lib/admin"
 import { getTransactions, type Transaction } from "@/lib/wallet"
 import { getAllUsers, getStoredAuth } from "@/lib/auth"
+import { addNotification } from "@/lib/notifications"
 import {
   DollarSign,
   TrendingUp,
@@ -119,6 +120,14 @@ export default function AdminFinancesPage() {
     })
     window.dispatchEvent(event)
 
+    // Send notification to user
+    addNotification(user.id, {
+      type: "withdrawal",
+      title: "Retiro Aprobado",
+      message: `Tu retiro de ${withdrawal.amount.toFixed(2)} USDT ha sido aprobado y procesado`,
+      link: "/dashboard/wallet",
+    })
+
     toast({
       title: "Retiro Aprobado",
       description: `El retiro de ${withdrawal.amount.toFixed(2)} USDT ha sido aprobado`,
@@ -182,6 +191,14 @@ export default function AdminFinancesPage() {
       detail: { key: "usdt_lottery_users", value: allUsers },
     })
     window.dispatchEvent(userEvent)
+
+    // Send notification to user
+    addNotification(user.id, {
+      type: "withdrawal",
+      title: "Retiro Rechazado",
+      message: `Tu retiro de ${withdrawal.amount.toFixed(2)} USDT ha sido rechazado. Los fondos han sido devueltos a tu balance.${reason ? ` Razón: ${reason}` : ""}`,
+      link: "/dashboard/wallet",
+    })
 
     toast({
       title: "Retiro Rechazado",

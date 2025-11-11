@@ -607,6 +607,44 @@ export default function SettingsPage() {
             </div>
             <Switch checked={notifications.newsletter} onCheckedChange={() => handleToggleNotification("newsletter")} />
           </div>
+
+          {/* Browser Notifications */}
+          {typeof window !== "undefined" && "Notification" in window && (
+            <div className="p-3 sm:p-4 rounded-lg bg-secondary/30 border border-primary/10">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex-1 pr-4">
+                  <p className="text-sm sm:text-base font-medium">Browser Notifications</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Receive notifications even when the app is closed
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {Notification.permission === "granted" ? (
+                    <span className="text-xs px-2 py-1 rounded-full bg-chart-2/20 text-chart-2">Enabled</span>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        const { requestNotificationPermission } = await import("@/lib/notifications")
+                        await requestNotificationPermission()
+                        toast({
+                          title: Notification.permission === "granted" ? "Notifications enabled" : "Permission denied",
+                          description:
+                            Notification.permission === "granted"
+                              ? "You'll receive browser notifications"
+                              : "Please enable notifications in your browser settings",
+                        })
+                      }}
+                      className="text-xs"
+                    >
+                      Enable
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 

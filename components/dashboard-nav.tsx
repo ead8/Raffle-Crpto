@@ -14,11 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LayoutDashboard, Ticket, History, Wallet, Settings, LogOut, Award, Menu, Bell, Users, X } from "lucide-react"
+import { LayoutDashboard, Ticket, History, Wallet, Settings, LogOut, Award, Menu, Bell, Users, X, Trophy } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import { getNotifications, markAsRead, markAllAsRead, getUnreadCount } from "@/lib/notifications"
+import { getNotifications, markAsRead, markAllAsRead, getUnreadCount, requestNotificationPermission } from "@/lib/notifications"
 import Image from "next/image"
 
 export function DashboardNav() {
@@ -33,9 +33,26 @@ export function DashboardNav() {
 
   useEffect(() => {
     if (user) {
-      const notifs = getNotifications(user.id)
-      setNotifications(notifs.slice(0, 5))
-      setUnreadCount(getUnreadCount(user.id))
+      const loadNotifications = () => {
+        const notifs = getNotifications(user.id)
+        setNotifications(notifs.slice(0, 5))
+        setUnreadCount(getUnreadCount(user.id))
+      }
+
+      loadNotifications()
+
+      // Listen for real-time notification updates
+      const handleNotificationUpdate = (e: CustomEvent) => {
+        if (e.detail.userId === user.id) {
+          loadNotifications()
+        }
+      }
+
+      window.addEventListener("notification-update" as any, handleNotificationUpdate as any)
+
+      return () => {
+        window.removeEventListener("notification-update" as any, handleNotificationUpdate as any)
+      }
     }
   }, [user])
 
@@ -81,6 +98,7 @@ export function DashboardNav() {
     { href: "/dashboard/lottery", name: t("nav.lotteries"), icon: Ticket },
     { href: "/dashboard/wallet", name: t("nav.wallet"), icon: Wallet },
     { href: "/dashboard/results", name: t("nav.results"), icon: Award },
+    { href: "/dashboard/leaderboards", name: "Leaderboards", icon: Trophy },
     { href: "/dashboard/history", name: t("nav.history"), icon: History },
     { href: "/dashboard/tasks", name: t("nav.tasks"), icon: Award },
     { href: "/dashboard/referrals", name: t("nav.referrals"), icon: Users },
@@ -141,26 +159,35 @@ export function DashboardNav() {
                         <p className="text-xs text-muted-foreground mt-1">{t("notifications.noNotifications.desc")}</p>
                       </div>
                     ) : (
-                      notifications.map((notif) => (
-                        <DropdownMenuItem
-                          key={notif.id}
-                          className={`cursor-pointer py-3 px-3 ${!notif.read ? "bg-primary/5" : ""}`}
-                          onClick={() => handleNotificationClick(notif.id, notif.link)}
-                        >
-                          <div className="flex flex-col gap-1 w-full">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="text-sm font-semibold text-foreground">{notif.title}</p>
-                              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                {formatTimeAgo(notif.timestamp)}
-                              </span>
+                      <>
+                        {notifications.map((notif) => (
+                          <DropdownMenuItem
+                            key={notif.id}
+                            className={`cursor-pointer py-3 px-3 ${!notif.read ? "bg-primary/5" : ""}`}
+                            onClick={() => handleNotificationClick(notif.id, notif.link)}
+                          >
+                            <div className="flex flex-col gap-1 w-full">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="text-sm font-semibold text-foreground">{notif.title}</p>
+                                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                  {formatTimeAgo(notif.timestamp)}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">{notif.message}</p>
+                              {!notif.read && (
+                                <div className="w-2 h-2 bg-primary rounded-full absolute left-1 top-1/2 -translate-y-1/2" />
+                              )}
                             </div>
-                            <p className="text-xs text-muted-foreground">{notif.message}</p>
-                            {!notif.read && (
-                              <div className="w-2 h-2 bg-primary rounded-full absolute left-1 top-1/2 -translate-y-1/2" />
-                            )}
-                          </div>
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator className="bg-primary/20" />
+                        <DropdownMenuItem
+                          className="cursor-pointer py-2 text-center justify-center text-primary font-medium"
+                          onClick={() => router.push("/dashboard/notifications")}
+                        >
+                          {t("notifications.viewAll")}
                         </DropdownMenuItem>
-                      ))
+                      </>
                     )}
                   </div>
                 </DropdownMenuContent>

@@ -170,6 +170,17 @@ export const addTransaction = (userId: string, transaction: Omit<Transaction, "i
     detail: { key: TRANSACTIONS_KEY, value: allTransactions },
   })
   window.dispatchEvent(event)
+
+  // Send notification for completed deposits
+  if (transaction.type === "deposit" && transaction.status === "completed") {
+    const { addNotification } = require("./notifications")
+    addNotification(userId, {
+      type: "deposit",
+      title: "Depósito confirmado",
+      message: `Tu depósito de ${transaction.amount} USDT ha sido confirmado y añadido a tu balance`,
+      link: "/dashboard/wallet",
+    })
+  }
 }
 
 export const generateWalletAddress = (): string => {

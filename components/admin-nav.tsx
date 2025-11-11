@@ -50,9 +50,10 @@ export function AdminNav() {
     { href: "/admin/users", label: "Usuarios", icon: Users },
     { href: "/admin/lotteries", label: "Sorteos", icon: Ticket },
     { href: "/admin/finances", label: "Finanzas", icon: DollarSign },
+    { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
     { href: "/admin/tasks", label: "Tareas", icon: Award },
     { href: "/admin/referrals", label: "Referidos", icon: TrendingUp },
-    { href: "/admin/results", label: "Resultados", icon: BarChart3 },
+    { href: "/admin/results", label: "Resultados", icon: Award },
     { href: "/admin/settings", label: "Configuración", icon: Settings },
   ]
 

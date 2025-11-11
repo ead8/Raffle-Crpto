@@ -1,6 +1,7 @@
 import { getLotteries, updateLottery, createLottery, type Lottery } from "./lottery"
 import { addTransaction } from "./wallet"
 import { updateUserBalance } from "./auth"
+import { addNotification } from "./notifications"
 
 const USERS_KEY = "usdt_lottery_users"
 const USER_TICKETS_KEY = "usdt_lottery_user_tickets"
@@ -110,6 +111,14 @@ export const distributePrize = (result: LotteryResult) => {
     status: "completed",
   })
 
+  // Send notification to winner
+  addNotification(result.winnerId, {
+    type: "prize",
+    title: "🎉 ¡Felicidades! Has ganado",
+    message: `Ganaste ${result.prizeAmount} USDT en ${result.lotteryTitle} con el ticket #${result.winningTicket}`,
+    link: "/dashboard/results",
+  })
+
   console.log("[v0] Prize distributed to", result.winnerName, "- Amount:", result.prizeAmount)
 }
 
@@ -173,6 +182,19 @@ export const processCompletedLotteries = () => {
 
         // Save result
         saveResult(result)
+
+        // Notify all participants that lottery ended
+        const allParticipants = lottery.participants.map((p) => p.userId)
+        allParticipants.forEach((participantId) => {
+          if (participantId !== result.winnerId) {
+            addNotification(participantId, {
+              type: "lottery_end",
+              title: "Sorteo finalizado",
+              message: `${lottery.title} ha finalizado. Revisa los resultados para ver el ganador.`,
+              link: "/dashboard/results",
+            })
+          }
+        })
 
         console.log("[v0] Lottery processed successfully:", lottery.id)
 

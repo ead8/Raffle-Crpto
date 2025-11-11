@@ -40,11 +40,30 @@ export function addNotification(
   const notifications = getNotifications(userId)
   notifications.unshift(newNotification)
 
-  // Keep only last 50 notifications
-  const trimmed = notifications.slice(0, 50)
+  // Keep only last 100 notifications (increased from 50)
+  const trimmed = notifications.slice(0, 100)
 
   if (typeof window !== "undefined") {
     localStorage.setItem(`${STORAGE_KEY}_${userId}`, JSON.stringify(trimmed))
+
+    // Trigger sync event for real-time updates
+    const event = new CustomEvent("notification-update", {
+      detail: { userId, notifications: trimmed },
+    })
+    window.dispatchEvent(event)
+
+    // Show browser notification if permission granted
+    if ("Notification" in window && Notification.permission === "granted") {
+      try {
+        new Notification(notification.title, {
+          body: notification.message,
+          icon: "/favicon.png",
+          tag: newNotification.id,
+        })
+      } catch (e) {
+        console.log("Browser notification failed:", e)
+      }
+    }
   }
 
   return newNotification
@@ -56,6 +75,12 @@ export function markAsRead(userId: string, notificationId: string): void {
 
   if (typeof window !== "undefined") {
     localStorage.setItem(`${STORAGE_KEY}_${userId}`, JSON.stringify(updated))
+
+    // Trigger sync event
+    const event = new CustomEvent("notification-update", {
+      detail: { userId, notifications: updated },
+    })
+    window.dispatchEvent(event)
   }
 }
 
@@ -65,7 +90,32 @@ export function markAllAsRead(userId: string): void {
 
   if (typeof window !== "undefined") {
     localStorage.setItem(`${STORAGE_KEY}_${userId}`, JSON.stringify(updated))
+
+    // Trigger sync event
+    const event = new CustomEvent("notification-update", {
+      detail: { userId, notifications: updated },
+    })
+    window.dispatchEvent(event)
   }
+}
+
+// Request browser notification permission
+export function requestNotificationPermission(): Promise<boolean> {
+  if (typeof window === "undefined" || !("Notification" in window)) {
+    return Promise.resolve(false)
+  }
+
+  if (Notification.permission === "granted") {
+    return Promise.resolve(true)
+  }
+
+  if (Notification.permission === "denied") {
+    return Promise.resolve(false)
+  }
+
+  return Notification.requestPermission().then((permission) => {
+    return permission === "granted"
+  })
 }
 
 export function getUnreadCount(userId: string): number {

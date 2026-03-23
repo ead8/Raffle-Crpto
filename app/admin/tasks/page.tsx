@@ -206,7 +206,7 @@ const TaskDialog = ({
           <div className="space-y-4 p-4 rounded-lg bg-accent/5 border border-accent/20">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Users className="w-5 h-5" />
-              Usuarios Objetivo
+              Target users
             </h3>
 
             <div className="space-y-2">

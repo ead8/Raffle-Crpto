@@ -415,7 +415,7 @@ export default function AdminUsersPage() {
                         <Users className="w-5 h-5 text-chart-3" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs sm:text-sm text-muted-foreground">Referidos</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Referrals</p>
                         <p className="text-lg sm:text-xl font-bold">{selectedUser.referralCount || 0}</p>
                       </div>
                     </div>

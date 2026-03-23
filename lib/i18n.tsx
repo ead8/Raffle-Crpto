@@ -1,9 +1,8 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, useMemo, useCallback, type ReactNode } from "react"
+import { createContext, useContext, useEffect, useMemo, useCallback, type ReactNode } from "react"
 
-type Language = "es" | "en"
-
+/** English-only: translations keep legacy `es` keys for reference; runtime always uses `en`. */
 interface Translations {
   [key: string]: {
     es: string
@@ -280,6 +279,12 @@ const translations: Translations = {
   "lottery.myTickets.status.lost": { es: "Perdido", en: "Lost" },
   "lottery.myTickets.status.finished": { es: "Finalizado", en: "Finished" },
   "lottery.myTickets.viewResults": { es: "Ver Resultados", en: "View Results" },
+  "lottery.myTickets.youWon": { es: "¡Ganaste!", en: "You won!" },
+  "lottery.myTickets.raffleEnded": { es: "Sorteo finalizado", en: "Raffle ended" },
+  "lottery.myTickets.tryAgain": {
+    es: "No ganaste en esta ocasión. ¡Sigue participando!",
+    en: "You didn't win this time. Keep playing!",
+  },
   "lottery.myTickets.noTickets": { es: "No tienes tickets", en: "You have no tickets" },
   "lottery.myTickets.noTickets.desc": {
     es: "Compra tickets para participar en los sorteos",
@@ -1122,51 +1127,34 @@ const translations: Translations = {
 }
 
 interface I18nContextType {
-  language: Language
-  setLanguage: (lang: Language) => void
   t: (key: string, params?: Record<string, string | number>) => string
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined)
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>("es")
-
   useEffect(() => {
-    const savedLang = localStorage.getItem("language") as Language
-    if (savedLang && (savedLang === "es" || savedLang === "en")) {
-      setLanguage(savedLang)
+    try {
+      localStorage.removeItem("language")
+    } catch {
+      /* ignore */
     }
   }, [])
 
-  const handleSetLanguage = useCallback((lang: Language) => {
-    setLanguage(lang)
-    localStorage.setItem("language", lang)
+  const t = useCallback((key: string, params?: Record<string, string | number>): string => {
+    const row = translations[key]
+    let translation = row?.en ?? row?.es ?? key
+
+    if (params) {
+      Object.entries(params).forEach(([paramKey, paramValue]) => {
+        translation = translation.replace(`{${paramKey}}`, String(paramValue))
+      })
+    }
+
+    return translation
   }, [])
 
-  const t = useCallback(
-    (key: string, params?: Record<string, string | number>): string => {
-      let translation = translations[key]?.[language] || key
-
-      if (params) {
-        Object.entries(params).forEach(([paramKey, paramValue]) => {
-          translation = translation.replace(`{${paramKey}}`, String(paramValue))
-        })
-      }
-
-      return translation
-    },
-    [language]
-  )
-
-  const contextValue = useMemo(
-    () => ({
-      language,
-      setLanguage: handleSetLanguage,
-      t,
-    }),
-    [language, handleSetLanguage, t]
-  )
+  const contextValue = useMemo(() => ({ t }), [t])
 
   return <I18nContext.Provider value={contextValue}>{children}</I18nContext.Provider>
 }

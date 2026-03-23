@@ -3,7 +3,6 @@
 import { useAuth } from "@/components/auth-provider"
 import { logout } from "@/lib/auth"
 import { useI18n } from "@/lib/i18n"
-import { LanguageSelector } from "@/components/language-selector"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -106,14 +105,14 @@ export function DashboardNav() {
   ]
 
   return (
-    <nav className="sticky top-0 z-50 glass-card border-b border-primary/20 backdrop-blur-xl bg-background/80">
+    <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-md">
       <div className="container mx-auto px-4">
         <div className="flex flex-col">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Link href="/dashboard" className="flex items-center gap-2">
                 <Image src="/logo.png" alt="Raffle USDT" width={32} height={32} className="w-8 h-8" />
-                <span className="font-bold text-lg">
+                <span className="font-semibold text-lg tracking-tight">
                   Raffle <span className="usdt-gradient">USDT</span>
                 </span>
               </Link>
@@ -193,8 +192,6 @@ export function DashboardNav() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <LanguageSelector />
-
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full hidden lg:flex">
@@ -258,7 +255,7 @@ export function DashboardNav() {
               <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
               <div className="fixed inset-0 bg-background flex flex-col min-h-screen">
                 <div className="flex items-center justify-between p-4 border-b border-primary/20">
-                  <h2 className="text-lg font-semibold">Menú</h2>
+                  <h2 className="text-lg font-semibold">Menu</h2>
                   <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
                     <X className="w-5 h-5" />
                   </Button>

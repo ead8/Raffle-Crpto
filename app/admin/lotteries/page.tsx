@@ -3,17 +3,27 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { getLotteries, type Lottery } from "@/lib/lottery"
+import type { Lottery } from "@/lib/lottery"
+import { fetchLotteries } from "@/lib/lotteries-api"
 import { Trophy, Plus, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useI18n } from "@/lib/i18n"
 
 export default function AdminLotteriesPage() {
+  const { t } = useI18n()
   const [lotteries, setLotteries] = useState<Lottery[]>([])
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    const loadLotteries = () => {
-      setLotteries(getLotteries())
+    const loadLotteries = async () => {
+      try {
+        setLoadError(null)
+        const data = await fetchLotteries()
+        setLotteries(data)
+      } catch (e) {
+        setLoadError(e instanceof Error ? e.message : "Failed to load lotteries")
+      }
     }
 
     loadLotteries()
@@ -27,18 +37,22 @@ export default function AdminLotteriesPage() {
   const completedLotteries = lotteries.filter((l) => l.status === "completed")
 
   const LotteryRow = ({ lottery }: { lottery: Lottery }) => (
-    <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors">
+    <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/30 border border-border/60 hover:border-primary/25 transition-colors">
       <div className="flex items-center gap-4 flex-1">
-        <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-lg bg-primary/15 flex items-center justify-center">
           <Trophy className="w-6 h-6 text-primary" />
         </div>
         <div className="flex-1">
           <p className="font-semibold">{lottery.title}</p>
-          <div className="flex items-center gap-4 mt-1">
-            <span className="text-sm text-muted-foreground">Premio: {lottery.prizeAmount} USDT</span>
-            <span className="text-sm text-muted-foreground">Precio: {lottery.ticketPrice} USDT</span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
             <span className="text-sm text-muted-foreground">
-              Tickets: {lottery.soldTickets}/{lottery.maxTickets}
+              {t("admin.lotteries.prize")}: {lottery.prizeAmount} USDT
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {t("admin.lotteries.price")}: {lottery.ticketPrice} USDT
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {t("admin.lotteries.tickets")}: {lottery.soldTickets}/{lottery.maxTickets}
             </span>
           </div>
         </div>
@@ -60,41 +74,51 @@ export default function AdminLotteriesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Gestión de Sorteos</h1>
-          <p className="text-muted-foreground">Administra todos los sorteos de la plataforma</p>
+          <h1 className="font-display text-3xl font-semibold tracking-tight mb-2">{t("admin.lotteries.title")}</h1>
+          <p className="text-muted-foreground">{t("admin.lotteries.subtitle")}</p>
+          {loadError && <p className="text-sm text-destructive mt-2">{loadError}</p>}
         </div>
         <Link href="/admin/lotteries/create">
-          <Button className="bg-primary hover:bg-primary/90 glow-effect">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
-            Crear Sorteo
+            {t("admin.lotteries.createRaffle")}
           </Button>
         </Link>
       </div>
 
       <Tabs defaultValue="active" className="space-y-6">
-        <TabsList className="glass-card border-primary/20 p-1">
-          <TabsTrigger value="active" className="data-[state=active]:bg-primary data-[state=active]:text-white">
-            Activos ({activeLotteries.length})
+        <TabsList className="glass-card border-border/60 p-1 h-auto flex-wrap">
+          <TabsTrigger
+            value="active"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md"
+          >
+            {t("admin.dashboard.active")} ({activeLotteries.length})
           </TabsTrigger>
-          <TabsTrigger value="upcoming" className="data-[state=active]:bg-primary data-[state=active]:text-white">
-            Próximos ({upcomingLotteries.length})
+          <TabsTrigger
+            value="upcoming"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md"
+          >
+            {t("admin.lotteries.upcoming")} ({upcomingLotteries.length})
           </TabsTrigger>
-          <TabsTrigger value="completed" className="data-[state=active]:bg-primary data-[state=active]:text-white">
-            Completados ({completedLotteries.length})
+          <TabsTrigger
+            value="completed"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-md"
+          >
+            {t("admin.lotteries.completed")} ({completedLotteries.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="active">
-          <Card className="glass-card border-primary/20 p-6">
+          <Card className="glass-card border-border/60 p-6">
             <div className="space-y-3">
               {activeLotteries.length > 0 ? (
                 activeLotteries.map((lottery) => <LotteryRow key={lottery.id} lottery={lottery} />)
               ) : (
                 <div className="text-center py-12">
                   <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <p className="text-muted-foreground">No hay sorteos activos</p>
+                  <p className="text-muted-foreground">{t("admin.lotteries.noActive")}</p>
                 </div>
               )}
             </div>
@@ -102,14 +126,14 @@ export default function AdminLotteriesPage() {
         </TabsContent>
 
         <TabsContent value="upcoming">
-          <Card className="glass-card border-primary/20 p-6">
+          <Card className="glass-card border-border/60 p-6">
             <div className="space-y-3">
               {upcomingLotteries.length > 0 ? (
                 upcomingLotteries.map((lottery) => <LotteryRow key={lottery.id} lottery={lottery} />)
               ) : (
                 <div className="text-center py-12">
                   <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <p className="text-muted-foreground">No hay sorteos próximos</p>
+                  <p className="text-muted-foreground">{t("admin.lotteries.noUpcoming")}</p>
                 </div>
               )}
             </div>
@@ -117,14 +141,14 @@ export default function AdminLotteriesPage() {
         </TabsContent>
 
         <TabsContent value="completed">
-          <Card className="glass-card border-primary/20 p-6">
+          <Card className="glass-card border-border/60 p-6">
             <div className="space-y-3">
               {completedLotteries.length > 0 ? (
                 completedLotteries.map((lottery) => <LotteryRow key={lottery.id} lottery={lottery} />)
               ) : (
                 <div className="text-center py-12">
                   <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <p className="text-muted-foreground">No hay sorteos completados</p>
+                  <p className="text-muted-foreground">{t("admin.lotteries.noCompleted")}</p>
                 </div>
               )}
             </div>

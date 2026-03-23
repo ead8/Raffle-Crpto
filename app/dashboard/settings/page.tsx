@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { User, Shield, Bell, Globe, Trash2, Check, X, Copy, Mail, AlertCircle } from "lucide-react"
+import { User, Shield, Bell, Trash2, Check, X, Copy, Mail, AlertCircle } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { useState, useRef, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
@@ -29,7 +28,7 @@ import { cn } from "@/lib/utils"
 
 export default function SettingsPage() {
   const { user, setUser } = useAuth()
-  const { t, language, setLanguage } = useI18n()
+  const { t } = useI18n()
   const { toast } = useToast()
 
   // Profile state
@@ -528,34 +527,6 @@ export default function SettingsPage() {
             >
               {isChangingPassword ? t("settings.security.changing") : t("settings.security.changePassword")}
             </Button>
-          </div>
-        </div>
-      </Card>
-
-      {/* Language Settings */}
-      <Card className="glass-card border-primary/20 p-4 sm:p-6">
-        <div className="flex items-center gap-3 mb-4 sm:mb-6">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-chart-4/20 flex items-center justify-center">
-            <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-chart-4" />
-          </div>
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold">{t("settings.language.title")}</h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">{t("settings.language.subtitle")}</p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>{t("settings.language.select")}</Label>
-            <Select value={language} onValueChange={(value: "es" | "en") => setLanguage(value)}>
-              <SelectTrigger className="bg-secondary/50 border-primary/20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="es">Español</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
       </Card>

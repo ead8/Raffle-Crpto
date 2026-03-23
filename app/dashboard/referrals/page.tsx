@@ -198,7 +198,7 @@ export default function ReferralsPage() {
         <div className="flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
           <div className="space-y-2">
-            <h3 className="font-semibold text-sm">Términos y Condiciones del Programa de Referidos</h3>
+            <h3 className="font-semibold text-sm">Referral program terms</h3>
             <div className="text-xs text-muted-foreground space-y-1">
               <p>
                 • El bono de registro de {settings.signupReward} USDT se otorga cuando tu referido completa su{" "}

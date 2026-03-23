@@ -3,47 +3,46 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Updated color scheme to USDT green theme with crypto aesthetics */
+/* Editorial / refined: deep ink with warm neutrals, USDT green as disciplined accent (OKLCH) */
 :root {
-  --background: oklch(0.12 0.02 160);
-  --foreground: oklch(0.98 0 0);
-  /* Increased opacity and added stronger backdrop for better contrast */
-  --card: oklch(0.15 0.03 160 / 0.7);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.15 0.03 160);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.65 0.15 165);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.25 0.04 160);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.25 0.04 160);
-  --muted-foreground: oklch(0.65 0.05 160);
-  --accent: oklch(0.55 0.18 165);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.25 0.05 160);
-  --input: oklch(0.2 0.04 160);
-  --ring: oklch(0.65 0.15 165);
-  --chart-1: oklch(0.65 0.15 165);
-  --chart-2: oklch(0.55 0.18 165);
-  --chart-3: oklch(0.45 0.12 170);
-  --chart-4: oklch(0.75 0.12 160);
-  --chart-5: oklch(0.35 0.08 165);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.15 0.03 160);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.65 0.15 165);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.25 0.04 160);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.25 0.05 160);
-  --sidebar-ring: oklch(0.65 0.15 165);
+  --background: oklch(0.16 0.028 168);
+  --foreground: oklch(0.97 0.012 95);
+  --card: oklch(0.2 0.022 168);
+  --card-foreground: oklch(0.97 0.012 95);
+  --popover: oklch(0.22 0.024 168);
+  --popover-foreground: oklch(0.97 0.012 95);
+  --primary: oklch(0.68 0.14 166);
+  --primary-foreground: oklch(0.14 0.03 168);
+  --secondary: oklch(0.26 0.03 168);
+  --secondary-foreground: oklch(0.94 0.02 95);
+  --muted: oklch(0.28 0.028 168);
+  --muted-foreground: oklch(0.72 0.04 168);
+  --accent: oklch(0.32 0.04 168);
+  --accent-foreground: oklch(0.97 0.012 95);
+  --destructive: oklch(0.58 0.2 25);
+  --destructive-foreground: oklch(0.98 0.01 95);
+  --border: oklch(0.34 0.04 168);
+  --input: oklch(0.24 0.03 168);
+  --ring: oklch(0.68 0.14 166);
+  --chart-1: oklch(0.68 0.14 166);
+  --chart-2: oklch(0.62 0.1 200);
+  --chart-3: oklch(0.55 0.08 168);
+  --chart-4: oklch(0.78 0.1 95);
+  --chart-5: oklch(0.45 0.06 168);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.18 0.025 168);
+  --sidebar-foreground: oklch(0.97 0.012 95);
+  --sidebar-primary: oklch(0.68 0.14 166);
+  --sidebar-primary-foreground: oklch(0.14 0.03 168);
+  --sidebar-accent: oklch(0.26 0.03 168);
+  --sidebar-accent-foreground: oklch(0.97 0.012 95);
+  --sidebar-border: oklch(0.34 0.04 168);
+  --sidebar-ring: oklch(0.68 0.14 166);
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --font-sans: var(--font-sans-body), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -88,46 +87,56 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "kern" 1, "liga" 1;
   }
 }
 
-/* Enhanced glassmorphism with stronger blur and better contrast */
-/* Increased blur intensity and improved contrast for better visibility */
+/* Display headings: Fraunces */
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+}
+
+/* Surfaces: restrained depth — not full glassmorphism */
 .glass-card {
-  background: rgba(15, 20, 25, 0.85);
-  backdrop-filter: blur(60px) saturate(200%);
-  -webkit-backdrop-filter: blur(60px) saturate(200%);
-  border: 1px solid rgba(38, 161, 123, 0.4);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(38, 161, 123, 0.1) inset;
+  background: color-mix(in oklch, var(--card) 94%, transparent);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  border: 1px solid color-mix(in oklch, var(--primary) 22%, var(--border));
+  box-shadow:
+    0 1px 0 color-mix(in oklch, oklch(1 0 0) 6%, transparent) inset,
+    0 18px 48px color-mix(in oklch, oklch(0 0 0) 45%, transparent);
 }
 
 .glow-effect {
-  box-shadow: 0 0 20px rgba(38, 161, 123, 0.4), 0 0 40px rgba(38, 161, 123, 0.25), 0 0 60px rgba(38, 161, 123, 0.15);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--primary) 35%, transparent),
+    0 10px 28px color-mix(in oklch, var(--primary) 18%, transparent);
 }
 
 .text-glow {
-  text-shadow: 0 0 10px rgba(38, 161, 123, 0.6), 0 0 20px rgba(38, 161, 123, 0.4);
+  text-shadow: 0 1px 18px color-mix(in oklch, var(--primary) 35%, transparent);
 }
 
-/* Animated gradient for USDT text */
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
+/* Static USDT wordmark — no infinite gradient animation */
 .usdt-gradient {
-  background: linear-gradient(90deg, #26a17b 0%, #50af95 25%, #3ecfa5 50%, #50af95 75%, #26a17b 100%);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradient-shift 3s ease infinite;
-  filter: drop-shadow(0 0 10px rgba(38, 161, 123, 0.6)) drop-shadow(0 0 20px rgba(38, 161, 123, 0.4));
+  color: oklch(0.74 0.13 166);
+  font-weight: 600;
+}
+
+/* Page backdrop accent */
+.mesh-bg {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse 90% 60% at 100% 0%, color-mix(in oklch, var(--primary) 22%, transparent), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 0% 100%, color-mix(in oklch, var(--chart-2) 14%, transparent), transparent 50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

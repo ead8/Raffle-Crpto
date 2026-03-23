@@ -3,7 +3,6 @@
 import { useAuth } from "@/components/auth-provider"
 import { logout } from "@/lib/auth"
 import { useI18n } from "@/lib/i18n"
-import { LanguageSelector } from "@/components/language-selector"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -47,14 +46,14 @@ export function AdminNav() {
 
   const adminNavItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/users", label: "Usuarios", icon: Users },
-    { href: "/admin/lotteries", label: "Sorteos", icon: Ticket },
-    { href: "/admin/finances", label: "Finanzas", icon: DollarSign },
+    { href: "/admin/users", label: "Users", icon: Users },
+    { href: "/admin/lotteries", label: "Raffles", icon: Ticket },
+    { href: "/admin/finances", label: "Finances", icon: DollarSign },
     { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/admin/tasks", label: "Tareas", icon: Award },
-    { href: "/admin/referrals", label: "Referidos", icon: TrendingUp },
-    { href: "/admin/results", label: "Resultados", icon: Award },
-    { href: "/admin/settings", label: "Configuración", icon: Settings },
+    { href: "/admin/tasks", label: "Tasks", icon: Award },
+    { href: "/admin/referrals", label: "Referrals", icon: TrendingUp },
+    { href: "/admin/results", label: "Results", icon: Award },
+    { href: "/admin/settings", label: "Settings", icon: Settings },
   ]
 
   return (
@@ -94,8 +93,6 @@ export function AdminNav() {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
-            <LanguageSelector />
-
             <Button
               variant="ghost"
               size="icon"
@@ -125,7 +122,7 @@ export function AdminNav() {
                     <p className="text-sm leading-none text-muted-foreground pt-1">{user?.email}</p>
                     <div className="flex items-center gap-2 pt-2 px-2 py-1.5 rounded-md bg-primary/10 border border-primary/20">
                       <Shield className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-semibold text-primary">Administrador</span>
+                      <span className="text-sm font-semibold text-primary">Administrator</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
@@ -173,7 +170,7 @@ export function AdminNav() {
                   <p className="text-sm text-muted-foreground">{user?.email}</p>
                   <div className="flex items-center gap-1.5 mt-1">
                     <Shield className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-xs font-medium text-primary">Administrador</span>
+                    <span className="text-xs font-medium text-primary">Administrator</span>
                   </div>
                 </div>
               </div>

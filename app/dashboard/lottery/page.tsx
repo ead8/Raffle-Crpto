@@ -8,16 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { LotteryCard } from "@/components/lottery-card"
 import {
-  getActiveLotteries,
-  getUpcomingLotteries,
-  getCompletedLotteries,
-  getUserTickets,
   type Lottery,
   type UserTicket,
 } from "@/lib/lottery"
 import { Ticket, Trophy, Clock, Sparkles, User } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { useAuth } from "@/components/auth-provider"
+import { fetchLotteries } from "@/lib/lotteries-api"
 
 export default function LotteryPage() {
   const { t } = useI18n()
@@ -26,15 +23,22 @@ export default function LotteryPage() {
   const [upcomingLotteries, setUpcomingLotteries] = useState<Lottery[]>([])
   const [completedLotteries, setCompletedLotteries] = useState<Lottery[]>([])
   const [userTickets, setUserTickets] = useState<UserTicket[]>([])
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    const loadLotteries = () => {
-      setActiveLotteries(getActiveLotteries())
-      setUpcomingLotteries(getUpcomingLotteries())
-      setCompletedLotteries(getCompletedLotteries())
-      if (user) {
-        setUserTickets(getUserTickets(user.id))
+    const loadLotteries = async () => {
+      try {
+        setLoadError(null)
+        const all = await fetchLotteries()
+        setActiveLotteries(all.filter((l) => l.status === "active"))
+        setUpcomingLotteries(all.filter((l) => l.status === "upcoming"))
+        setCompletedLotteries(all.filter((l) => l.status === "completed"))
+      } catch (e) {
+        setLoadError(e instanceof Error ? e.message : "Failed to load lotteries")
       }
+
+      // TODO: migrate user tickets from local demo storage to DB.
+      if (user) setUserTickets([])
     }
 
     loadLotteries()
@@ -48,6 +52,7 @@ export default function LotteryPage() {
       <div>
         <h1 className="text-3xl font-bold mb-2">{t("lottery.title")}</h1>
         <p className="text-muted-foreground">{t("lottery.subtitle")}</p>
+        {loadError && <p className="text-sm text-destructive mt-2">{loadError}</p>}
       </div>
 
       {/* Stats Banner */}
@@ -188,7 +193,7 @@ export default function LotteryPage() {
                               <div className="flex items-center gap-3">
                                 <Trophy className="w-6 h-6 text-green-500" />
                                 <div>
-                                  <p className="font-bold text-green-500 text-lg">¡Ganaste!</p>
+                                  <p className="font-bold text-green-500 text-lg">{t("lottery.myTickets.youWon")}</p>
                                   <p className="text-sm text-muted-foreground">{t("lottery.prize")}</p>
                                 </div>
                               </div>
@@ -204,10 +209,8 @@ export default function LotteryPage() {
                             <div className="flex items-center gap-3">
                               <Clock className="w-6 h-6 text-muted-foreground" />
                               <div>
-                                <p className="font-bold text-muted-foreground">Sorteo Finalizado</p>
-                                <p className="text-sm text-muted-foreground">
-                                  No ganaste en esta ocasión. ¡Sigue participando!
-                                </p>
+                                <p className="font-bold text-muted-foreground">{t("lottery.myTickets.raffleEnded")}</p>
+                                <p className="text-sm text-muted-foreground">{t("lottery.myTickets.tryAgain")}</p>
                               </div>
                             </div>
                           </div>

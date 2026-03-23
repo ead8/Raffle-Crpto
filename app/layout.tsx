@@ -1,16 +1,25 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Fraunces, IBM_Plex_Sans } from "next/font/google"
 import { AuthProvider } from "@/components/auth-provider"
 import { I18nProvider } from "@/lib/i18n"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400", "600", "700"],
+})
+
+const ibmSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans-body",
+})
 
 export const metadata: Metadata = {
-  title: "Raffle USDT - Win Big Every Hour",
-  description: "Plataforma de sorteos de USDT con premios cada hora",
+  title: "Raffle USDT — Hourly USDT raffles",
+  description: "Buy tickets, join hourly raffles, and win USDT with transparent draws and fast payouts.",
   generator: "v0.app",
   icons: {
     icon: "/favicon.png",
@@ -25,8 +34,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html>
-      <body className={`font-sans antialiased`}>
+    <html lang="en" className={`${fraunces.variable} ${ibmSans.variable}`}>
+      <body className="font-sans antialiased min-h-screen">
         <I18nProvider>
           <AuthProvider>{children}</AuthProvider>
         </I18nProvider>

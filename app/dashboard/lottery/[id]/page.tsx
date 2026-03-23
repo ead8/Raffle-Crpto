@@ -16,12 +16,14 @@ import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/lib/i18n"
 
 export default function LotteryDetailPage() {
   const params = useParams()
   const router = useRouter()
   const { user, refreshAuth } = useAuth()
   const { toast } = useToast()
+  const { t } = useI18n()
   const [lottery, setLottery] = useState<Lottery | null>(null)
   const [ticketCount, setTicketCount] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -152,7 +154,7 @@ export default function LotteryDetailPage() {
               <div className="p-4 rounded-lg bg-secondary/30 border border-primary/10">
                 <div className="flex items-center gap-2 mb-2">
                   <Ticket className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Precio por Ticket</span>
+                  <span className="text-sm text-muted-foreground">{t("lotteryCard.ticketPrice")}</span>
                 </div>
                 <p className="text-2xl font-bold">{lottery.ticketPrice} USDT</p>
               </div>
@@ -321,7 +323,7 @@ export default function LotteryDetailPage() {
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">
-                    <span className="text-sm text-muted-foreground">Precio por ticket</span>
+                    <span className="text-sm text-muted-foreground">{t("lotteryCard.ticketPrice")}</span>
                     <span className="font-semibold">{lottery.ticketPrice} USDT</span>
                   </div>
                   <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">

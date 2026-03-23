@@ -34,13 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1f1a] via-[#0d1b16] to-[#0a1410] relative">
-      {/* Background effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-[#26A17B] rounded-full blur-[120px] opacity-10 animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#50AF95] rounded-full blur-[120px] opacity-10 animate-pulse delay-1000"></div>
-      </div>
-
+    <div className="min-h-screen mesh-bg relative">
       <AutomationMonitor />
       <AdminNav />
       <main className="relative z-10">{children}</main>

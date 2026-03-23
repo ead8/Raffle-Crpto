@@ -19,15 +19,15 @@ export function LotteryCard({ lottery }: LotteryCardProps) {
   const isAlmostFull = progress >= 80
 
   return (
-    <Card className="glass-card border-primary/20 p-6 hover:border-primary/40 transition-all group">
+    <Card className="glass-card border-border/70 p-6 hover:border-primary/30 transition-colors duration-300 group">
       <div className="space-y-4">
         {/* Header */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-xl font-bold mb-1">{lottery.title}</h3>
+            <h3 className="font-display text-xl font-semibold mb-1 tracking-tight">{lottery.title}</h3>
             <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-primary" />
-              <span className="text-2xl font-bold text-primary text-glow">{lottery.prizeAmount} USDT</span>
+              <Trophy className="w-4 h-4 text-primary shrink-0" strokeWidth={1.75} />
+              <span className="text-2xl font-semibold text-primary tabular-nums">{lottery.prizeAmount} USDT</span>
             </div>
           </div>
           {lottery.status === "active" && (
@@ -96,7 +96,7 @@ export function LotteryCard({ lottery }: LotteryCardProps) {
         {/* Action Button */}
         <Link href={`/dashboard/lottery/${lottery.id}`}>
           <Button
-            className="w-full bg-primary hover:bg-primary/90 glow-effect group-hover:scale-[1.02] transition-transform"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition-transform duration-200 group-hover:translate-y-[-1px]"
             disabled={lottery.status !== "active"}
           >
             {lottery.status === "active" ? t("lotteryCard.buyTickets") : t("lotteryCard.viewDetails")}

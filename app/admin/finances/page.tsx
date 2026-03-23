@@ -313,13 +313,13 @@ export default function AdminFinancesPage() {
       color: "text-accent",
     },
     {
-      label: "Premios Pagados",
+      label: "Prizes paid",
       value: `${stats.totalPrizesPaid.toFixed(2)} USDT`,
       icon: Trophy,
       color: "text-chart-4",
     },
     {
-      label: "Balance Usuarios",
+      label: "User balances",
       value: `${stats.userBalances.toFixed(2)} USDT`,
       icon: Users,
       color: "text-primary",
@@ -367,7 +367,7 @@ export default function AdminFinancesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Contabilidad y Finanzas</h1>
+          <h1 className="font-display text-3xl font-semibold tracking-tight mb-2">Accounting & finances</h1>
           <p className="text-muted-foreground">Seguimiento completo de todas las transacciones y finanzas</p>
         </div>
         <Link href="/admin">
@@ -508,7 +508,7 @@ export default function AdminFinancesPage() {
                 <SelectItem value="deposit">Depósitos</SelectItem>
                 <SelectItem value="withdrawal">Retiros</SelectItem>
                 <SelectItem value="ticket_purchase">Compra de Tickets</SelectItem>
-                <SelectItem value="prize_won">Premios</SelectItem>
+                <SelectItem value="prize_won">Prizes</SelectItem>
               </SelectContent>
             </Select>
           </div>

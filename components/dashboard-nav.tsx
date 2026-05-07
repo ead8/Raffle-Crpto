@@ -55,8 +55,8 @@ export function DashboardNav() {
     }
   }, [user])
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     setAuth(null)
     router.push("/")
   }
@@ -95,6 +95,7 @@ export function DashboardNav() {
   const navItems = [
     { href: "/dashboard", name: t("nav.dashboard"), icon: LayoutDashboard },
     { href: "/dashboard/lottery", name: t("nav.lotteries"), icon: Ticket },
+    { href: "/dashboard/tickets", name: "My Tickets", icon: Ticket },
     { href: "/dashboard/wallet", name: t("nav.wallet"), icon: Wallet },
     { href: "/dashboard/results", name: t("nav.results"), icon: Award },
     { href: "/dashboard/leaderboards", name: "Leaderboards", icon: Trophy },
@@ -111,9 +112,9 @@ export function DashboardNav() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Link href="/dashboard" className="flex items-center gap-2">
-                <Image src="/logo.png" alt="Raffle USDT" width={32} height={32} className="w-8 h-8" />
+                <Image src="/logo.png" alt="Drixx" width={32} height={32} className="w-8 h-8" />
                 <span className="font-semibold text-lg tracking-tight">
-                  Raffle <span className="usdt-gradient">USDT</span>
+                  Dri<span className="usdt-gradient">xx</span>
                 </span>
               </Link>
             </div>

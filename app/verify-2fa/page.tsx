@@ -48,8 +48,8 @@ export default function Verify2FAPage() {
     navigator.clipboard.writeText(secretKey)
     setCopied(true)
     toast({
-      title: "Código copiado",
-      description: "La clave secreta ha sido copiada al portapapeles",
+      title: "Code copied",
+      description: "The secret key has been copied to clipboard",
     })
     setTimeout(() => setCopied(false), 2000)
   }
@@ -57,8 +57,8 @@ export default function Verify2FAPage() {
   const handleVerify = async () => {
     if (verificationCode.length !== 6) {
       toast({
-        title: "Código inválido",
-        description: "Por favor ingresa un código de 6 dígitos",
+        title: "Invalid code",
+        description: "Please enter a 6-digit code",
         variant: "destructive",
       })
       return
@@ -70,8 +70,8 @@ export default function Verify2FAPage() {
     setTimeout(() => {
       // For demo purposes, accept any 6-digit code
       toast({
-        title: "Verificación exitosa",
-        description: "2FA ha sido configurado correctamente",
+        title: "Verification successful",
+        description: "2FA has been configured successfully",
       })
 
       // Redirect to dashboard after successful verification
@@ -85,11 +85,11 @@ export default function Verify2FAPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1f1a] via-[#0d1b16] to-[#0a1410] relative overflow-hidden flex items-center justify-center p-4">
+    <div className="min-h-screen mesh-bg relative overflow-hidden flex items-center justify-center p-4">
       {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-[#26A17B] rounded-full blur-[120px] opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#50AF95] rounded-full blur-[120px] opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute top-20 left-20 w-96 h-96 bg-primary rounded-full blur-[120px] opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-primary/60 rounded-full blur-[120px] opacity-20 animate-pulse delay-1000"></div>
       </div>
 
       <Card className="glass-card border-primary/30 p-8 w-full max-w-lg relative z-10">
@@ -98,7 +98,7 @@ export default function Verify2FAPage() {
           className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Omitir por ahora
+          Skip for now
         </button>
 
         <div className="flex items-center gap-3 mb-8">
@@ -106,8 +106,8 @@ export default function Verify2FAPage() {
             <Shield className="w-7 h-7 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Verificación 2FA</h1>
-            <p className="text-sm text-muted-foreground">Configura Google Authenticator</p>
+            <h1 className="text-2xl font-bold">2FA Verification</h1>
+            <p className="text-sm text-muted-foreground">Set up Google Authenticator</p>
           </div>
         </div>
 
@@ -118,10 +118,10 @@ export default function Verify2FAPage() {
               <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
                 1
               </div>
-              <h3 className="font-semibold">Escanea el código QR</h3>
+              <h3 className="font-semibold">Scan the QR code</h3>
             </div>
             <p className="text-sm text-muted-foreground ml-8">
-              Abre Google Authenticator en tu teléfono y escanea este código QR
+              Open Google Authenticator on your phone and scan this QR code
             </p>
 
             {/* QR Code */}
@@ -144,10 +144,10 @@ export default function Verify2FAPage() {
               <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
                 2
               </div>
-              <h3 className="font-semibold">O ingresa la clave manualmente</h3>
+              <h3 className="font-semibold">Or enter the key manually</h3>
             </div>
             <p className="text-sm text-muted-foreground ml-8">
-              Si no puedes escanear el código, ingresa esta clave en Google Authenticator
+              If you can't scan the code, enter this key in Google Authenticator
             </p>
 
             <div className="ml-8 p-4 bg-secondary/30 rounded-lg border border-primary/20">
@@ -166,14 +166,14 @@ export default function Verify2FAPage() {
               <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
                 3
               </div>
-              <h3 className="font-semibold">Ingresa el código de verificación</h3>
+              <h3 className="font-semibold">Enter the verification code</h3>
             </div>
             <p className="text-sm text-muted-foreground ml-8">
-              Ingresa el código de 6 dígitos que aparece en Google Authenticator
+              Enter the 6-digit code shown in Google Authenticator
             </p>
 
             <div className="ml-8 space-y-2">
-              <Label htmlFor="verification-code">Código de verificación</Label>
+              <Label htmlFor="verification-code">Verification code</Label>
               <Input
                 id="verification-code"
                 type="text"
@@ -192,14 +192,14 @@ export default function Verify2FAPage() {
             className="w-full bg-primary hover:bg-primary/90 text-white glow-effect"
             disabled={loading || verificationCode.length !== 6}
           >
-            {loading ? "Verificando..." : "Verificar y Activar 2FA"}
+            {loading ? "Verifying..." : "Verify and Enable 2FA"}
           </Button>
 
           {/* Info Box */}
           <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
             <p className="text-xs text-blue-400">
-              <strong>Nota:</strong> Una vez activado, necesitarás ingresar el código de Google Authenticator cada vez
-              que inicies sesión para mayor seguridad.
+              <strong>Note:</strong> Once enabled, you'll need to enter the Google Authenticator code every time you
+              log in for added security.
             </p>
           </div>
         </div>

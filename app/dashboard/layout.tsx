@@ -48,7 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             </div>
             <p className="text-muted-foreground text-sm">
-              &copy; {new Date().getFullYear()} Raffle <span className="usdt-gradient">USDT</span>.{" "}
+              &copy; {new Date().getFullYear()} Drixx <span className="usdt-gradient">USDT</span>.{" "}
               {t("footer.copyright")}
             </p>
           </div>

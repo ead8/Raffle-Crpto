@@ -40,7 +40,7 @@ export default function AdminResultsPage() {
               <Trophy className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">{t("admin.results.completedRaffles")}</p>
+              <p className="text-sm text-muted-foreground">{t("admin.results.completedDraws")}</p>
               <p className="text-2xl font-bold">{results.length}</p>
             </div>
           </div>

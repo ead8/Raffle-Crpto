@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { createAdminSupabaseClient } from "@/lib/supabase/admin"
+import { cookies } from "next/headers"
+import { createClient } from "@/utils/supabase/server"
 
 export const runtime = "nodejs"
 
@@ -14,18 +15,20 @@ type DbLotteryRow = {
   end_time: string
   status: "active" | "completed" | "upcoming"
   winner_id: string | null
-  winner_name: string | null
   winning_ticket: string | null
+  winner: { name: string | null } | null
 }
 
 export async function GET() {
   try {
-    const supabase = createAdminSupabaseClient()
+    const cookieStore = await cookies()
+    const supabase = createClient(cookieStore)
 
     const { data, error } = await supabase
       .from("lotteries")
       .select(
-        "id,title,prize_amount,ticket_price,max_tickets,sold_tickets,start_time,end_time,status,winner_id,winner_name,winning_ticket",
+        `id,title,prize_amount,ticket_price,max_tickets,sold_tickets,start_time,end_time,status,winner_id,winning_ticket,
+         winner:profiles!winner_id(name)`,
       )
       .order("start_time", { ascending: false })
 
@@ -33,18 +36,18 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    const lotteries = (data as DbLotteryRow[]).map((row) => ({
+    const lotteries = ((data ?? []) as unknown as DbLotteryRow[]).map((row) => ({
       id: row.id,
       title: row.title,
-      prizeAmount: row.prize_amount,
-      ticketPrice: row.ticket_price,
+      prizeAmount: Number(row.prize_amount),
+      ticketPrice: Number(row.ticket_price),
       maxTickets: row.max_tickets,
       soldTickets: row.sold_tickets,
       startTime: row.start_time,
       endTime: row.end_time,
       status: row.status,
       winnerId: row.winner_id ?? undefined,
-      winnerName: row.winner_name ?? undefined,
+      winnerName: row.winner?.name ?? undefined,
       winningTicket: row.winning_ticket ?? undefined,
       participants: [],
     }))
@@ -55,4 +58,3 @@ export async function GET() {
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

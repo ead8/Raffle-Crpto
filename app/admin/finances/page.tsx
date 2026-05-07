@@ -195,13 +195,13 @@ export default function AdminFinancesPage() {
     // Send notification to user
     addNotification(user.id, {
       type: "withdrawal",
-      title: "Retiro Rechazado",
-      message: `Tu retiro de ${withdrawal.amount.toFixed(2)} USDT ha sido rechazado. Los fondos han sido devueltos a tu balance.${reason ? ` Razón: ${reason}` : ""}`,
+      title: "Withdrawal Rejected",
+      message: `Your withdrawal of ${withdrawal.amount.toFixed(2)} USDT has been rejected. The funds have been returned to your balance.${reason ? ` Reason: ${reason}` : ""}`,
       link: "/dashboard/wallet",
     })
 
     toast({
-      title: "Retiro Rechazado",
+      title: "Withdrawal Rejected",
       description: `El retiro ha sido rechazado y los fondos devueltos al usuario`,
     })
 
@@ -238,7 +238,7 @@ export default function AdminFinancesPage() {
   }, [filterType, startDate, endDate, transactions])
 
   const exportToCSV = () => {
-    const headers = ["ID", "Usuario", "Tipo", "Monto", "Fecha", "Estado", "Descripción"]
+    const headers = ["ID", "User", "Type", "Amount", "Date", "Status", "Description"]
     const rows = filteredTransactions.map((tx) => [
       tx.id,
       tx.userName,
@@ -295,7 +295,7 @@ export default function AdminFinancesPage() {
 
   const detailCards = [
     {
-      label: "Total Depósitos",
+      label: "Total Deposits",
       value: `${stats.totalDeposits.toFixed(2)} USDT`,
       icon: ArrowDownCircle,
       color: "text-chart-2",
@@ -371,7 +371,7 @@ export default function AdminFinancesPage() {
           <p className="text-muted-foreground">Seguimiento completo de todas las transacciones y finanzas</p>
         </div>
         <Link href="/admin">
-          <Button variant="outline">Volver al Panel</Button>
+          <Button variant="outline">Back to Panel</Button>
         </Link>
       </div>
 
@@ -385,7 +385,7 @@ export default function AdminFinancesPage() {
               <div>
                 <h2 className="text-xl font-bold">Retiros Pendientes</h2>
                 <p className="text-sm text-muted-foreground">
-                  {pendingWithdrawals.length} retiros esperando aprobación
+                  {pendingWithdrawals.length} withdrawals awaiting approval
                 </p>
               </div>
             </div>
@@ -498,14 +498,14 @@ export default function AdminFinancesPage() {
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="space-y-2">
-            <Label>Tipo de Transacción</Label>
+            <Label>Transaction Type</Label>
             <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="deposit">Depósitos</SelectItem>
+                <SelectItem value="deposit">Deposits</SelectItem>
                 <SelectItem value="withdrawal">Retiros</SelectItem>
                 <SelectItem value="ticket_purchase">Compra de Tickets</SelectItem>
                 <SelectItem value="prize_won">Prizes</SelectItem>
@@ -599,7 +599,7 @@ export default function AdminFinancesPage() {
                 )}
                 {selectedWithdrawal.destinationAddress && (
                   <div className="flex flex-col gap-1">
-                    <span className="text-sm text-muted-foreground">Dirección de Destino:</span>
+                    <span className="text-sm text-muted-foreground">Destination Address:</span>
                     <span className="text-sm font-mono break-all bg-primary/10 p-2 rounded">{selectedWithdrawal.destinationAddress}</span>
                   </div>
                 )}
@@ -608,7 +608,7 @@ export default function AdminFinancesPage() {
                   <span className="text-sm">{new Date(selectedWithdrawal.timestamp).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Descripción:</span>
+                  <span className="text-sm text-muted-foreground">Description:</span>
                   <span className="text-sm">{selectedWithdrawal.description}</span>
                 </div>
               </div>

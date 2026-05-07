@@ -26,9 +26,9 @@ export default function LandingPage() {
       <header className="relative z-10 border-b border-border/60 bg-background/75 backdrop-blur-md">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 min-w-0">
-            <Image src="/logo.png" alt="Raffle USDT" width={40} height={40} className="w-8 h-8 sm:w-10 sm:h-10 shrink-0" />
+            <Image src="/logo.png" alt="Drixx" width={40} height={40} className="w-8 h-8 sm:w-10 sm:h-10 shrink-0" />
             <span className="text-base sm:text-xl font-semibold tracking-tight truncate">
-              Raffle <span className="usdt-gradient">USDT</span>
+              Dri<span className="usdt-gradient">xx</span>
             </span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -77,7 +77,7 @@ export default function LandingPage() {
                   variant="outline"
                   className="w-full sm:w-auto h-12 border-border bg-transparent hover:bg-secondary/50"
                 >
-                  {t("landing.cta.viewRaffles")}
+                  {t("landing.cta.viewDraws")}
                 </Button>
               </Link>
             </div>
@@ -92,7 +92,7 @@ export default function LandingPage() {
                   <dd className="font-display text-3xl sm:text-4xl font-semibold text-primary tabular-nums">$50K+</dd>
                 </div>
                 <div className="flex justify-between items-baseline gap-4 border-b border-border/50 pb-5">
-                  <dt className="text-sm text-muted-foreground max-w-[55%]">{t("landing.stats.activeRaffles")}</dt>
+                  <dt className="text-sm text-muted-foreground max-w-[55%]">{t("landing.stats.activeDraws")}</dt>
                   <dd className="font-display text-3xl sm:text-4xl font-semibold tabular-nums">24/7</dd>
                 </div>
                 <div className="flex justify-between items-baseline gap-4">
@@ -161,7 +161,7 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} Raffle <span className="usdt-gradient">USDT</span>. {t("footer.copyright")}
+            &copy; {new Date().getFullYear()} Drixx <span className="usdt-gradient">USDT</span>. {t("footer.copyright")}
           </p>
         </div>
       </footer>

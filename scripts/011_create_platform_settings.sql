@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS platform_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
   -- General Settings
-  platform_name TEXT NOT NULL DEFAULT 'Raffle USDT',
-  support_email TEXT NOT NULL DEFAULT 'support@usdtlottery.com',
+  platform_name TEXT NOT NULL DEFAULT 'Drixx',
+  support_email TEXT NOT NULL DEFAULT 'support@drixx.app',
   
   -- Lottery Settings
   default_lottery_duration_minutes INTEGER NOT NULL DEFAULT 60,

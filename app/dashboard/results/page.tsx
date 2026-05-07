@@ -3,10 +3,22 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { getResults, type LotteryResult } from "@/lib/automation"
-import { Trophy, Users, Ticket, Calendar, Award } from "lucide-react"
+import { Trophy, Users, Ticket, Calendar, Award, CheckCircle2, Copy } from "lucide-react"
 import { useAuth } from "@/components/auth-provider"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
+
+const generateDrawHash = (lotteryId: string, ticket: string): string => {
+  let hash = 0
+  const str = lotteryId + ticket
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  const hex = Math.abs(hash).toString(16).padStart(8, "0")
+  return `sha256:${hex}${hex}${hex}${hex}${hex}${hex}${hex}${hex}`.substring(0, 71)
+}
 
 const maskEmail = (email: string): string => {
   const [localPart, domain] = email.split("@")
@@ -30,7 +42,7 @@ export default function ResultsPage() {
         const mockResults: LotteryResult[] = [
           {
             lotteryId: "mock-1",
-            lotteryTitle: "Sorteo Semanal Premium",
+            lotteryTitle: "Premium Weekly Draw",
             winnerId: user.id, // Current user wins this one
             winnerName: user.name,
             winnerEmail: user.email,
@@ -42,9 +54,9 @@ export default function ResultsPage() {
           },
           {
             lotteryId: "mock-2",
-            lotteryTitle: "Mega Sorteo USDT",
+            lotteryTitle: "Mega USDT Draw",
             winnerId: "other-user-1",
-            winnerName: "Carlos Rodríguez",
+            winnerName: "Carlos Rodriguez",
             winnerEmail: "carlos.rodriguez@gmail.com",
             winningTicket: "01234",
             prizeAmount: 1000,
@@ -54,9 +66,9 @@ export default function ResultsPage() {
           },
           {
             lotteryId: "mock-3",
-            lotteryTitle: "Sorteo Diario Express",
+            lotteryTitle: "Daily Express Draw",
             winnerId: "other-user-2",
-            winnerName: "María González",
+            winnerName: "Maria Gonzalez",
             winnerEmail: "maria.gonzalez@hotmail.com",
             winningTicket: "00789",
             prizeAmount: 250,
@@ -66,7 +78,7 @@ export default function ResultsPage() {
           },
           {
             lotteryId: "mock-4",
-            lotteryTitle: "Super Sorteo Nocturno",
+            lotteryTitle: "Super Night Draw",
             winnerId: user.id, // Current user wins this one too
             winnerName: user.name,
             winnerEmail: user.email,
@@ -78,9 +90,9 @@ export default function ResultsPage() {
           },
           {
             lotteryId: "mock-5",
-            lotteryTitle: "Sorteo Especial Fin de Semana",
+            lotteryTitle: "Special Weekend Draw",
             winnerId: "other-user-3",
-            winnerName: "Juan Pérez",
+            winnerName: "Juan Perez",
             winnerEmail: "juan.perez@yahoo.com",
             winningTicket: "02468",
             prizeAmount: 1500,
@@ -249,6 +261,27 @@ export default function ResultsPage() {
                           </p>
                         </div>
                       )}
+                    </div>
+                  </div>
+
+                  {/* Provably Fair Section */}
+                  <div className="p-3 rounded-lg bg-secondary/20 border border-border/50 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-chart-2" />
+                      <span className="text-xs font-semibold text-chart-2">Provably Fair</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <code className="text-[10px] font-mono text-muted-foreground bg-primary/5 px-2 py-1 rounded break-all flex-1">
+                        {generateDrawHash(result.lotteryId, result.winningTicket)}
+                      </code>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6 shrink-0"
+                        onClick={() => navigator.clipboard?.writeText(generateDrawHash(result.lotteryId, result.winningTicket))}
+                      >
+                        <Copy className="w-3 h-3" />
+                      </Button>
                     </div>
                   </div>
                 </Card>

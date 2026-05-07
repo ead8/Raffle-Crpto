@@ -201,20 +201,20 @@ export default function ReferralsPage() {
             <h3 className="font-semibold text-sm">Referral program terms</h3>
             <div className="text-xs text-muted-foreground space-y-1">
               <p>
-                • El bono de registro de {settings.signupReward} USDT se otorga cuando tu referido completa su{" "}
-                <span className="font-semibold text-foreground">primer depósito de 100 USDT o más</span>.
+                • The {settings.signupReward} USDT signup bonus is awarded when your referral completes their{" "}
+                <span className="font-semibold text-foreground">first deposit of 100 USDT or more</span>.
               </p>
               <p>
-                • Si el primer depósito del referido es menor a 100 USDT, no recibirás el bono de registro y depósitos
-                posteriores no califican.
+                • If the referral's first deposit is less than 100 USDT, you will not receive the signup bonus, and
+                subsequent deposits do not qualify.
               </p>
               <p>
-                • Ganarás una comisión del {settings.commissionRate}% en cada compra de tickets que realice tu referido,
-                de por vida.
+                • You'll earn a {settings.commissionRate}% commission on every ticket purchase made by your referral,
+                for life.
               </p>
-              <p>• Las comisiones se acreditan automáticamente en tu billetera después de cada compra del referido.</p>
-              <p>• Los bonos y comisiones pueden ser usados para comprar tickets o retirados a tu billetera externa.</p>
-              <p>• El programa de referidos está sujeto a revisión por actividad fraudulenta o abuso del sistema.</p>
+              <p>• Commissions are credited automatically to your wallet after each referral purchase.</p>
+              <p>• Bonuses and commissions can be used to buy tickets or withdrawn to your external wallet.</p>
+              <p>• The referral program is subject to review for fraudulent activity or system abuse.</p>
             </div>
           </div>
         </div>

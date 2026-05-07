@@ -70,13 +70,13 @@ export default function TermsPage() {
             </CardContent>
           </Card>
 
-          {/* Raffles and Tickets */}
+          {/* Draws and Tickets */}
           <Card className="glass-card border-primary/20">
             <CardHeader>
-              <CardTitle>{t("terms.raffles.title")}</CardTitle>
+              <CardTitle>{t("terms.draws.title")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground leading-relaxed">{t("terms.raffles.content")}</p>
+              <p className="text-muted-foreground leading-relaxed">{t("terms.draws.content")}</p>
             </CardContent>
           </Card>
 

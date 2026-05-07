@@ -30,30 +30,24 @@ export default function AdminLoginPage() {
     try {
       const user = await login(email, password)
 
-      if (user && user.role === "admin") {
+      if (user.role === "admin") {
         setAuth(user)
         toast({
-          title: "Bienvenido Administrador",
-          description: `Has iniciado sesión como ${user.name}`,
+          title: "Welcome, Admin",
+          description: `You've logged in as ${user.name}`,
         })
         router.push("/admin")
-      } else if (user && user.role !== "admin") {
-        toast({
-          title: "Acceso Denegado",
-          description: "No tienes permisos de administrador",
-          variant: "destructive",
-        })
       } else {
         toast({
-          title: "Error de Autenticación",
-          description: "Credenciales incorrectas",
+          title: "Access Denied",
+          description: "You don't have admin permissions",
           variant: "destructive",
         })
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Ocurrió un error al iniciar sesión",
+        title: "Authentication Error",
+        description: error instanceof Error ? error.message : "Incorrect credentials",
         variant: "destructive",
       })
     } finally {
@@ -62,7 +56,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1f1a] via-[#0d1b16] to-[#0a1410] relative overflow-hidden flex items-center justify-center p-4">
+    <div className="min-h-screen mesh-bg relative overflow-hidden flex items-center justify-center p-4">
       {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-20 w-96 h-96 bg-primary/20 rounded-full blur-[120px] opacity-10 animate-pulse"></div>
@@ -75,19 +69,19 @@ export default function AdminLoginPage() {
             <Shield className="w-8 h-8 text-primary" />
           </div>
           <div className="space-y-2">
-            <CardTitle className="text-2xl font-bold">Panel de Administración</CardTitle>
-            <CardDescription>Ingresa tus credenciales para acceder</CardDescription>
+            <CardTitle className="text-2xl font-bold">Admin Panel</CardTitle>
+            <CardDescription>Enter your credentials to access</CardDescription>
           </div>
         </CardHeader>
 
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email de Administrador</Label>
+              <Label htmlFor="email">Admin Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@usdtlottery.com"
+                placeholder="admin@drixx.app"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -96,7 +90,7 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -138,28 +132,14 @@ export default function AdminLoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Iniciando sesión...
+                  Logging in...
                 </>
               ) : (
-                "Iniciar Sesión"
+                "Log In"
               )}
             </Button>
           </form>
 
-          {/* Test credentials */}
-          <div className="pt-4 border-t border-border">
-            <p className="text-xs text-muted-foreground text-center mb-3">Credenciales de prueba:</p>
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between p-2 rounded bg-muted/50">
-                <span className="text-muted-foreground">Admin:</span>
-                <code className="text-foreground">admin@usdtlottery.com</code>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded bg-muted/50">
-                <span className="text-muted-foreground">Password:</span>
-                <code className="text-foreground">Admin123!</code>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

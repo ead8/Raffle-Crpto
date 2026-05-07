@@ -43,12 +43,12 @@ function initializeDefaultTask(): void {
         type: "new_users",
       },
       conditions: [
-        "El primer depósito debe ser de 100 USDT o más", // Updated condition
-        "Si el primer depósito es menor a 100 USDT, no recibirás el bono",
-        "Depósitos posteriores no califican para el bono",
-        "El bono se acreditará automáticamente después del primer depósito válido",
-        "El bono puede ser usado para comprar tickets de sorteos",
-        "Esta oferta es válida solo para nuevos usuarios",
+        "The first deposit must be 100 USDT or more",
+        "If the first deposit is less than 100 USDT, you will not receive the bonus",
+        "Subsequent deposits do not qualify for the bonus",
+        "The bonus will be credited automatically after the first valid deposit",
+        "The bonus can be used to buy raffle tickets",
+        "This offer is valid only for new users",
       ],
       isActive: true,
       currentCompletions: 0,
@@ -355,7 +355,7 @@ export function enrollUserInTask(
   message?: string
 } {
   const task = getTask(taskId)
-  if (!task) return { success: false, message: "Tarea no encontrada" }
+  if (!task) return { success: false, message: "Task not found" }
 
   // Check eligibility
   const isEligible = checkTaskEligibility(userId, task, userRegistrationDate)
@@ -410,20 +410,20 @@ export function checkTaskEligibility(
 
   // Check if task is active
   if (!task.isActive) {
-    return { eligible: false, reason: "Esta tarea no está activa actualmente" }
+    return { eligible: false, reason: "This task is not currently active" }
   }
 
   // Check validity period
   if (task.validFrom && now < task.validFrom) {
-    return { eligible: false, reason: "Esta tarea aún no ha comenzado" }
+    return { eligible: false, reason: "This task has not started yet" }
   }
   if (task.validUntil && now > task.validUntil) {
-    return { eligible: false, reason: "Esta tarea ha expirado" }
+    return { eligible: false, reason: "This task has expired" }
   }
 
   // Check max completions
   if (task.maxCompletions && task.currentCompletions >= task.maxCompletions) {
-    return { eligible: false, reason: "Esta tarea ha alcanzado el máximo de completaciones" }
+    return { eligible: false, reason: "This task has reached the maximum number of completions" }
   }
 
   // Check user targeting
@@ -437,7 +437,7 @@ export function checkTaskEligibility(
       if (userRegistrationDate < thirtyDaysAgo) {
         return {
           eligible: false,
-          reason: "Esta tarea es solo para usuarios nuevos (registrados en los últimos 30 días)",
+          reason: "This task is only for new users (registered in the last 30 days)",
         }
       }
       return { eligible: true }
@@ -448,7 +448,7 @@ export function checkTaskEligibility(
         const dateStr = task.userTargeting.registeredAfter?.toLocaleDateString() || ""
         return {
           eligible: false,
-          reason: `Esta tarea es solo para usuarios registrados después del ${dateStr}`,
+          reason: `This task is only for users registered after ${dateStr}`,
         }
       }
       return { eligible: true }
@@ -456,12 +456,12 @@ export function checkTaskEligibility(
 
     case "specific_users": {
       if (!task.userTargeting.userIds?.includes(userId)) {
-        return { eligible: false, reason: "Esta tarea no está disponible para tu cuenta" }
+        return { eligible: false, reason: "This task is not available for your account" }
       }
       return { eligible: true }
     }
 
     default:
-      return { eligible: false, reason: "Configuración de tarea inválida" }
+      return { eligible: false, reason: "Invalid task configuration" }
   }
 }

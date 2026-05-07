@@ -170,11 +170,11 @@ export default function TasksPage() {
   const getRequirementText = (task: Task): string => {
     switch (task.requirement.type) {
       case "deposit":
-        return `Deposita ${task.requirement.amount} USDT`
+        return `Deposit ${task.requirement.amount} USDT`
       case "lottery_spending":
-        return `Gasta ${task.requirement.amount} USDT en sorteos`
+        return `Spend ${task.requirement.amount} USDT on raffles`
       case "referrals":
-        return `Refiere ${task.requirement.count} usuarios`
+        return `Refer ${task.requirement.count} users`
       default:
         return task.description
     }
@@ -201,7 +201,7 @@ export default function TasksPage() {
       }
 
       case "referrals": {
-        return `0 / ${task.requirement.count} usuarios`
+        return `0 / ${task.requirement.count} users`
       }
 
       default:
@@ -213,7 +213,7 @@ export default function TasksPage() {
     const now = new Date()
     const diff = expiresAt.getTime() - now.getTime()
 
-    if (diff <= 0) return "Expirado"
+    if (diff <= 0) return "Expired"
 
     const hours = Math.floor(diff / (1000 * 60 * 60))
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
@@ -281,7 +281,7 @@ export default function TasksPage() {
               <Gift className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-xl font-semibold mb-2">{t("tasks.noTasks")}</h3>
               <p className="text-muted-foreground">
-                No tienes tareas disponibles en este momento. Vuelve más tarde para ver nuevas oportunidades.
+                You have no tasks available right now. Come back later for new opportunities.
               </p>
             </Card>
           ) : (
@@ -319,7 +319,7 @@ export default function TasksPage() {
                         {canClaim ? (
                           <Badge variant="default" className="text-sm bg-green-500">
                             <CheckCircle2 className="w-4 h-4 mr-2" />
-                            Lista para reclamar
+                            Ready to claim
                           </Badge>
                         ) : isEnrolled ? (
                           isCompleted ? (
@@ -368,7 +368,7 @@ export default function TasksPage() {
                     {/* Conditions */}
                     {task.conditions.length > 0 && (
                       <div className="space-y-3">
-                        <h3 className="text-lg font-semibold">Condiciones</h3>
+                        <h3 className="text-lg font-semibold">Conditions</h3>
                         <ul className="space-y-2">
                           {task.conditions.map((condition, index) => (
                             <li key={index} className="flex items-start gap-3">
@@ -420,7 +420,7 @@ export default function TasksPage() {
                 <Card className="glass-card border-primary/20 p-8 text-center">
                   <CheckCircle2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-xl font-semibold mb-2">{t("tasks.noHistory")}</h3>
-                  <p className="text-muted-foreground">No has reclamado ninguna tarea todavía</p>
+                  <p className="text-muted-foreground">You haven't claimed any task yet</p>
                 </Card>
               ) : (
                 claimedTasks.map((claim) => {
@@ -437,7 +437,7 @@ export default function TasksPage() {
                           <div className="flex-1">
                             <h3 className="text-lg font-bold">{task.title}</h3>
                             <p className="text-sm text-muted-foreground">
-                              Reclamada el {claim.claimedAt?.toLocaleDateString()}
+                              Claimed on {claim.claimedAt?.toLocaleDateString()}
                             </p>
                           </div>
                         </div>
@@ -458,8 +458,8 @@ export default function TasksPage() {
               {expiredTasks.length === 0 ? (
                 <Card className="glass-card border-primary/20 p-8 text-center">
                   <Clock className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-xl font-semibold mb-2">No hay tareas caducadas</h3>
-                  <p className="text-muted-foreground">Las tareas que no reclames a tiempo aparecerán aquí</p>
+                  <h3 className="text-xl font-semibold mb-2">No expired tasks</h3>
+                  <p className="text-muted-foreground">Tasks you don't claim in time will appear here</p>
                 </Card>
               ) : (
                 expiredTasks.map((claim) => {
@@ -476,7 +476,7 @@ export default function TasksPage() {
                           <div className="flex-1">
                             <h3 className="text-lg font-bold">{task.title}</h3>
                             <p className="text-sm text-muted-foreground">
-                              Expiró el {claim.expiresAt?.toLocaleDateString()}
+                              Expired on {claim.expiresAt?.toLocaleDateString()}
                             </p>
                           </div>
                         </div>

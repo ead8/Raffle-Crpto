@@ -40,8 +40,9 @@ export default function AdminAnalyticsPage() {
     loadAnalytics()
   }, [timeRange])
 
-  const loadAnalytics = () => {
-    setAnalytics(getAnalyticsData())
+  const loadAnalytics = async () => {
+    const data = await getAnalyticsData()
+    setAnalytics(data)
     setRevenueData(getRevenueTimeSeries(Number.parseInt(timeRange)))
     setUserGrowthData(getUserGrowthTimeSeries(Number.parseInt(timeRange)))
   }

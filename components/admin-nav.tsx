@@ -38,8 +38,8 @@ export function AdminNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { t } = useI18n()
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     setAuth(null)
     router.push("/")
   }
@@ -47,7 +47,7 @@ export function AdminNav() {
   const adminNavItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/users", label: "Users", icon: Users },
-    { href: "/admin/lotteries", label: "Raffles", icon: Ticket },
+    { href: "/admin/lotteries", label: "Draws", icon: Ticket },
     { href: "/admin/finances", label: "Finances", icon: DollarSign },
     { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
     { href: "/admin/tasks", label: "Tasks", icon: Award },
@@ -139,12 +139,12 @@ export function AdminNav() {
 
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Overlay oscuro */}
+          {/* Dark overlay */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
 
-          {/* Panel del menú - pantalla completa */}
+          {/* Menu panel - full screen */}
           <div className="absolute inset-0 bg-background flex flex-col min-h-screen">
-            {/* Header del menú móvil con botón de cerrar */}
+            {/* Mobile menu header with close button */}
             <div className="flex items-center justify-between p-4 border-b border-primary/20">
               <div className="flex items-center gap-2">
                 <Shield className="w-8 h-8 text-primary" />
@@ -157,7 +157,7 @@ export function AdminNav() {
               </Button>
             </div>
 
-            {/* Información del usuario */}
+            {/* User info */}
             <div className="p-4 border-b border-primary/20">
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12 border-2 border-primary/30">
@@ -176,7 +176,7 @@ export function AdminNav() {
               </div>
             </div>
 
-            {/* Navegación */}
+            {/* Navigation */}
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
               {adminNavItems.map((item) => {
                 const Icon = item.icon
@@ -200,7 +200,7 @@ export function AdminNav() {
               })}
             </div>
 
-            {/* Botón de logout */}
+            {/* Logout button */}
             <div className="p-4 border-t border-primary/20">
               <Button
                 onClick={handleLogout}

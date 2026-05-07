@@ -1,3 +1,5 @@
+import { createClient } from "@/utils/supabase/client"
+
 export interface Lottery {
   id: string
   title: string
@@ -12,14 +14,16 @@ export interface Lottery {
   winnerName?: string
   winningTicket?: string
   participants: LotteryParticipant[]
-  autoRecreate?: boolean // Added autoRecreate property for automatic lottery recreation
+  autoRecreate?: boolean
+  drawHash?: string
+  type?: "standard" | "no-loss"
 }
 
 export interface LotteryParticipant {
   userId: string
   userName: string
   ticketCount: number
-  ticketNumbers: string[] // Updated to string[]
+  ticketNumbers: string[]
 }
 
 export interface UserTicket {
@@ -28,314 +32,249 @@ export interface UserTicket {
   lotteryTitle: string
   ticketNumbers: string[]
   purchaseDate: string
-  endDate: string // Added to track when the raffle ends
+  endDate: string
   status: "active" | "won" | "lost"
   prizeAmount?: number
 }
 
-const LOTTERIES_KEY = "usdt_lottery_lotteries"
-const USER_TICKETS_KEY = "usdt_lottery_user_tickets"
+interface LotteryRow {
+  id: string
+  title: string
+  prize_amount: number | string
+  ticket_price: number | string
+  max_tickets: number
+  sold_tickets: number
+  start_time: string
+  end_time: string
+  status: "active" | "completed" | "upcoming"
+  winner_id: string | null
+  winning_ticket: string | null
+  auto_recreate: boolean | null
+  winner?: { name: string | null } | null
+}
 
-// Initialize with demo lotteries
-export const initializeLotteries = () => {
-  if (typeof window === "undefined") return
+interface TicketRow {
+  id: string
+  lottery_id: string
+  user_id: string
+  ticket_number: string
+  purchase_date: string
+  status: "active" | "won" | "lost"
+  user?: { name: string | null } | null
+}
 
-  const existing = localStorage.getItem(LOTTERIES_KEY)
-  if (!existing) {
-    const now = new Date()
-    const demoLotteries: Lottery[] = [
-      {
-        id: "lottery-1",
-        title: "Sorteo Rápido",
-        prizeAmount: 500,
-        ticketPrice: 5,
-        maxTickets: 100,
-        soldTickets: 45,
-        startTime: new Date(now.getTime() - 30 * 60000).toISOString(),
-        endTime: new Date(now.getTime() + 30 * 60000).toISOString(),
-        status: "active",
-        participants: [],
-      },
-      {
-        id: "lottery-2",
-        title: "Mega Sorteo",
-        prizeAmount: 1000,
-        ticketPrice: 10,
-        maxTickets: 150,
-        soldTickets: 89,
-        startTime: new Date(now.getTime() - 15 * 60000).toISOString(),
-        endTime: new Date(now.getTime() + 45 * 60000).toISOString(),
-        status: "active",
-        participants: [],
-      },
-      {
-        id: "lottery-3",
-        title: "Sorteo Express",
-        prizeAmount: 250,
-        ticketPrice: 2,
-        maxTickets: 80,
-        soldTickets: 32,
-        startTime: new Date(now.getTime() - 45 * 60000).toISOString(),
-        endTime: new Date(now.getTime() + 15 * 60000).toISOString(),
-        status: "active",
-        participants: [],
-      },
-      {
-        id: "lottery-4",
-        title: "Sorteo Premium",
-        prizeAmount: 2000,
-        ticketPrice: 20,
-        maxTickets: 200,
-        soldTickets: 0,
-        startTime: new Date(now.getTime() + 60 * 60000).toISOString(),
-        endTime: new Date(now.getTime() + 120 * 60000).toISOString(),
-        status: "upcoming",
-        participants: [],
-      },
-    ]
-    localStorage.setItem(LOTTERIES_KEY, JSON.stringify(demoLotteries))
+function rowToLottery(row: LotteryRow, participants: LotteryParticipant[] = []): Lottery {
+  return {
+    id: row.id,
+    title: row.title,
+    prizeAmount: Number(row.prize_amount),
+    ticketPrice: Number(row.ticket_price),
+    maxTickets: row.max_tickets,
+    soldTickets: row.sold_tickets,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    status: row.status,
+    winnerId: row.winner_id ?? undefined,
+    winnerName: row.winner?.name ?? undefined,
+    winningTicket: row.winning_ticket ?? undefined,
+    autoRecreate: row.auto_recreate ?? undefined,
+    participants,
   }
 }
 
-export const initializeDemoUserTickets = (userId: string) => {
-  if (typeof window === "undefined") return
+const LOTTERY_COLUMNS =
+  "id,title,prize_amount,ticket_price,max_tickets,sold_tickets,start_time,end_time,status,winner_id,winning_ticket,auto_recreate"
 
-  const stored = localStorage.getItem(USER_TICKETS_KEY)
-  const allUserTickets: Record<string, UserTicket[]> = stored ? JSON.parse(stored) : {}
-
-  // Only initialize if user has no tickets yet
-  if (!allUserTickets[userId] || allUserTickets[userId].length === 0) {
-    const now = new Date()
-
-    allUserTickets[userId] = [
-      {
-        id: "demo-ticket-1",
-        lotteryId: "lottery-1",
-        lotteryTitle: "Sorteo Rápido",
-        ticketNumbers: ["123456", "789012", "345678"],
-        purchaseDate: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-        endDate: new Date(now.getTime() + 30 * 60000).toISOString(),
-        status: "active",
-      },
-      {
-        id: "demo-ticket-2",
-        lotteryId: "lottery-2",
-        lotteryTitle: "Mega Sorteo",
-        ticketNumbers: ["456789", "901234"],
-        purchaseDate: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
-        endDate: new Date(now.getTime() + 45 * 60000).toISOString(),
-        status: "active",
-      },
-      {
-        id: "demo-ticket-3",
-        lotteryId: "completed-1",
-        lotteryTitle: "Sorteo Semanal #45",
-        ticketNumbers: ["112233", "445566"],
-        purchaseDate: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        endDate: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        status: "won",
-        prizeAmount: 500,
-      },
-      {
-        id: "demo-ticket-4",
-        lotteryId: "completed-2",
-        lotteryTitle: "Sorteo Diario #89",
-        ticketNumbers: ["778899"],
-        purchaseDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-        endDate: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-        status: "lost",
-      },
-    ]
-
-    localStorage.setItem(USER_TICKETS_KEY, JSON.stringify(allUserTickets))
-  }
+export async function getLotteries(): Promise<Lottery[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("lotteries")
+    .select(`${LOTTERY_COLUMNS},winner:profiles!winner_id(name)`)
+    .order("start_time", { ascending: false })
+  if (error) throw new Error(error.message)
+  return ((data ?? []) as unknown as LotteryRow[]).map((r) => rowToLottery(r))
 }
 
-export const getLotteries = (): Lottery[] => {
-  if (typeof window === "undefined") return []
+export async function getActiveLotteries(): Promise<Lottery[]> {
+  return (await getLotteries()).filter((l) => l.status === "active")
+}
 
-  initializeLotteries()
-  const stored = localStorage.getItem(LOTTERIES_KEY)
-  if (!stored) return []
+export async function getUpcomingLotteries(): Promise<Lottery[]> {
+  return (await getLotteries()).filter((l) => l.status === "upcoming")
+}
 
-  const lotteries: Lottery[] = JSON.parse(stored)
+export async function getCompletedLotteries(): Promise<Lottery[]> {
+  return (await getLotteries()).filter((l) => l.status === "completed")
+}
 
-  // Update lottery statuses based on current time
-  const now = new Date()
-  const updated = lotteries.map((lottery) => {
-    const endTime = new Date(lottery.endTime)
-    const startTime = new Date(lottery.startTime)
+export async function getLotteryById(id: string): Promise<Lottery | null> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("lotteries")
+    .select(`${LOTTERY_COLUMNS},winner:profiles!winner_id(name)`)
+    .eq("id", id)
+    .maybeSingle()
+  if (error || !data) return null
 
-    if (now > endTime && lottery.status === "active") {
-      return { ...lottery, status: "completed" as const }
+  const { data: ticketsData } = await supabase
+    .from("lottery_tickets")
+    .select("ticket_number,user_id,user:profiles!user_id(name)")
+    .eq("lottery_id", id)
+
+  const grouped = new Map<string, LotteryParticipant>()
+  ;((ticketsData ?? []) as unknown as TicketRow[]).forEach((t) => {
+    const existing = grouped.get(t.user_id)
+    if (existing) {
+      existing.ticketCount += 1
+      existing.ticketNumbers.push(t.ticket_number)
+    } else {
+      grouped.set(t.user_id, {
+        userId: t.user_id,
+        userName: t.user?.name ?? "Player",
+        ticketCount: 1,
+        ticketNumbers: [t.ticket_number],
+      })
     }
-    if (now >= startTime && now <= endTime && lottery.status === "upcoming") {
-      return { ...lottery, status: "active" as const }
-    }
-    return lottery
   })
 
-  localStorage.setItem(LOTTERIES_KEY, JSON.stringify(updated))
-  return updated
+  return rowToLottery(data as unknown as LotteryRow, Array.from(grouped.values()))
 }
 
-export const getLotteryById = (id: string): Lottery | null => {
-  const lotteries = getLotteries()
-  return lotteries.find((l) => l.id === id) || null
+export async function getUserTickets(userId: string): Promise<UserTicket[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("lottery_tickets")
+    .select(
+      `id,lottery_id,ticket_number,purchase_date,status,
+       lottery:lotteries!lottery_id(title,end_time,prize_amount)`,
+    )
+    .eq("user_id", userId)
+    .order("purchase_date", { ascending: false })
+  if (error || !data) return []
+
+  type Row = {
+    id: string
+    lottery_id: string
+    ticket_number: string
+    purchase_date: string
+    status: "active" | "won" | "lost"
+    lottery: { title: string; end_time: string; prize_amount: number | string } | null
+  }
+
+  const grouped = new Map<string, UserTicket>()
+  ;(data as unknown as Row[]).forEach((row) => {
+    const key = `${row.lottery_id}:${row.status}`
+    const existing = grouped.get(key)
+    if (existing) {
+      existing.ticketNumbers.push(row.ticket_number)
+    } else {
+      grouped.set(key, {
+        id: row.id,
+        lotteryId: row.lottery_id,
+        lotteryTitle: row.lottery?.title ?? "Draw",
+        ticketNumbers: [row.ticket_number],
+        purchaseDate: row.purchase_date,
+        endDate: row.lottery?.end_time ?? row.purchase_date,
+        status: row.status,
+        prizeAmount:
+          row.status === "won" && row.lottery ? Number(row.lottery.prize_amount) : undefined,
+      })
+    }
+  })
+
+  return Array.from(grouped.values())
 }
 
-export const purchaseTickets = (lotteryId: string, userId: string, userName: string, ticketCount: number): string[] => {
-  if (typeof window === "undefined") return []
+function generateTicketNumber(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
 
-  const lotteries = getLotteries()
-  const lotteryIndex = lotteries.findIndex((l) => l.id === lotteryId)
+export async function purchaseTickets(
+  lotteryId: string,
+  userId: string,
+  _userName: string,
+  ticketCount: number,
+): Promise<string[]> {
+  if (ticketCount <= 0) throw new Error("Invalid ticket count")
+  const supabase = createClient()
 
-  if (lotteryIndex === -1) return []
+  const { data: lotteryRow, error: lotteryError } = await supabase
+    .from("lotteries")
+    .select("id,status,max_tickets,sold_tickets,ticket_price")
+    .eq("id", lotteryId)
+    .maybeSingle()
+  if (lotteryError) throw new Error(lotteryError.message)
+  if (!lotteryRow) throw new Error("Draw not found")
+  if (lotteryRow.status !== "active") throw new Error("Draw is not active")
 
-  const lottery = lotteries[lotteryIndex]
+  const available = lotteryRow.max_tickets - lotteryRow.sold_tickets
+  if (ticketCount > available) throw new Error(`Only ${available} tickets available`)
 
-  // Validate lottery is active
-  if (lottery.status !== "active") {
-    throw new Error("Lottery is not active")
-  }
+  const { data: existing } = await supabase
+    .from("lottery_tickets")
+    .select("ticket_number")
+    .eq("lottery_id", lotteryId)
+  const taken = new Set<string>(((existing ?? []) as { ticket_number: string }[]).map((r) => r.ticket_number))
 
-  // Validate available tickets
-  const availableTickets = lottery.maxTickets - lottery.soldTickets
-  if (ticketCount > availableTickets) {
-    throw new Error(`Only ${availableTickets} tickets available`)
-  }
-
-  // Validate ticket count
-  if (ticketCount <= 0) {
-    throw new Error("Invalid ticket count")
-  }
-
-  // Generate 6-digit ticket numbers
   const ticketNumbers: string[] = []
-  for (let i = 0; i < ticketCount; i++) {
-    // Generate random 6-digit number (100000-999999)
-    const randomTicket = Math.floor(100000 + Math.random() * 900000).toString()
-    ticketNumbers.push(randomTicket)
+  while (ticketNumbers.length < ticketCount) {
+    const candidate = generateTicketNumber()
+    if (!taken.has(candidate)) {
+      ticketNumbers.push(candidate)
+      taken.add(candidate)
+    }
   }
 
-  // Update lottery
-  const existingParticipant = lottery.participants.find((p) => p.userId === userId)
-  if (existingParticipant) {
-    existingParticipant.ticketCount += ticketCount
-    existingParticipant.ticketNumbers.push(...ticketNumbers)
-  } else {
-    lottery.participants.push({
-      userId,
-      userName,
-      ticketCount,
-      ticketNumbers,
-    })
-  }
+  const rows = ticketNumbers.map((n) => ({
+    lottery_id: lotteryId,
+    user_id: userId,
+    ticket_number: n,
+  }))
 
-  lottery.soldTickets += ticketCount
-  lotteries[lotteryIndex] = lottery
-  localStorage.setItem(LOTTERIES_KEY, JSON.stringify(lotteries))
-
-  // Trigger sync event for lotteries
-  const lotteryEvent = new CustomEvent("storage-sync", {
-    detail: { key: LOTTERIES_KEY, value: lotteries },
-  })
-  window.dispatchEvent(lotteryEvent)
-
-  const purchaseAmount = lottery.ticketPrice * ticketCount
-  const { addReferralCommission } = require("./referrals")
-  addReferralCommission(userId, purchaseAmount)
-
-  // Save user tickets
-  const userTicketsData = localStorage.getItem(USER_TICKETS_KEY)
-  const allUserTickets: Record<string, UserTicket[]> = userTicketsData ? JSON.parse(userTicketsData) : {}
-
-  if (!allUserTickets[userId]) {
-    allUserTickets[userId] = []
-  }
-
-  const existingTicket = allUserTickets[userId].find((t) => t.lotteryId === lotteryId && t.status === "active")
-  if (existingTicket) {
-    existingTicket.ticketNumbers.push(...ticketNumbers)
-  } else {
-    allUserTickets[userId].push({
-      id: "ticket-" + Date.now(),
-      lotteryId,
-      lotteryTitle: lottery.title,
-      ticketNumbers,
-      purchaseDate: new Date().toISOString(),
-      endDate: lottery.endTime,
-      status: "active",
-    })
-  }
-
-  localStorage.setItem(USER_TICKETS_KEY, JSON.stringify(allUserTickets))
-
-  const ticketsEvent = new CustomEvent("storage-sync", {
-    detail: { key: USER_TICKETS_KEY, value: allUserTickets },
-  })
-  window.dispatchEvent(ticketsEvent)
+  const { error: insertError } = await supabase.from("lottery_tickets").insert(rows)
+  if (insertError) throw new Error(insertError.message)
 
   return ticketNumbers
 }
 
-export const getUserTickets = (userId: string): UserTicket[] => {
-  if (typeof window === "undefined") return []
-
-  initializeDemoUserTickets(userId)
-
-  const stored = localStorage.getItem(USER_TICKETS_KEY)
-  if (!stored) return []
-
-  const allUserTickets: Record<string, UserTicket[]> = JSON.parse(stored)
-  return allUserTickets[userId] || []
-}
-
-export const getActiveLotteries = (): Lottery[] => {
-  return getLotteries().filter((l) => l.status === "active")
-}
-
-export const getUpcomingLotteries = (): Lottery[] => {
-  return getLotteries().filter((l) => l.status === "upcoming")
-}
-
-export const getCompletedLotteries = (): Lottery[] => {
-  return getLotteries().filter((l) => l.status === "completed")
-}
-
-export const updateLottery = (lottery: Lottery) => {
-  if (typeof window === "undefined") return
-
-  const lotteries = getLotteries()
-  const index = lotteries.findIndex((l) => l.id === lottery.id)
-
-  if (index !== -1) {
-    lotteries[index] = lottery
-    localStorage.setItem(LOTTERIES_KEY, JSON.stringify(lotteries))
-
-    const event = new CustomEvent("storage-sync", {
-      detail: { key: LOTTERIES_KEY, value: lotteries },
+export async function createLottery(
+  lottery: Omit<Lottery, "id" | "soldTickets" | "participants">,
+): Promise<Lottery> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("lotteries")
+    .insert({
+      title: lottery.title,
+      prize_amount: lottery.prizeAmount,
+      ticket_price: lottery.ticketPrice,
+      max_tickets: lottery.maxTickets,
+      start_time: lottery.startTime,
+      end_time: lottery.endTime,
+      status: lottery.status,
+      auto_recreate: lottery.autoRecreate ?? false,
     })
-    window.dispatchEvent(event)
-  }
+    .select(LOTTERY_COLUMNS)
+    .single()
+  if (error || !data) throw new Error(error?.message ?? "Failed to create draw")
+  return rowToLottery(data as unknown as LotteryRow)
 }
 
-export const createLottery = (lottery: Omit<Lottery, "id" | "soldTickets" | "participants">) => {
-  if (typeof window === "undefined") return
-
-  const lotteries = getLotteries()
-  const newLottery: Lottery = {
-    ...lottery,
-    id: "lottery-" + Date.now(),
-    soldTickets: 0,
-    participants: [],
-  }
-
-  lotteries.push(newLottery)
-  localStorage.setItem(LOTTERIES_KEY, JSON.stringify(lotteries))
-
-  const event = new CustomEvent("storage-sync", {
-    detail: { key: LOTTERIES_KEY, value: lotteries },
-  })
-  window.dispatchEvent(event)
+export async function updateLottery(lottery: Lottery): Promise<void> {
+  const supabase = createClient()
+  const { error } = await supabase
+    .from("lotteries")
+    .update({
+      title: lottery.title,
+      prize_amount: lottery.prizeAmount,
+      ticket_price: lottery.ticketPrice,
+      max_tickets: lottery.maxTickets,
+      start_time: lottery.startTime,
+      end_time: lottery.endTime,
+      status: lottery.status,
+      winner_id: lottery.winnerId ?? null,
+      winning_ticket: lottery.winningTicket ?? null,
+      auto_recreate: lottery.autoRecreate ?? false,
+    })
+    .eq("id", lottery.id)
+  if (error) throw new Error(error.message)
 }

@@ -128,8 +128,8 @@ function initializeDemoNotifications(userId: string): Notification[] {
     {
       id: "demo-notif-1",
       type: "prize",
-      title: "¡Felicidades! Has ganado",
-      message: "Ganaste 500 USDT en el Sorteo Semanal #45",
+      title: "Congratulations! You won",
+      message: "You won 500 USDT in Weekly Draw #45",
       timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
       read: false,
       link: "/dashboard/results",
@@ -137,8 +137,8 @@ function initializeDemoNotifications(userId: string): Notification[] {
     {
       id: "demo-notif-2",
       type: "lottery_end",
-      title: "Sorteo finalizado",
-      message: "El Mega Sorteo #12 ha finalizado. Revisa los resultados",
+      title: "Draw ended",
+      message: "Mega Draw #12 has ended. Check the results",
       timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
       read: false,
       link: "/dashboard/results",
@@ -146,8 +146,8 @@ function initializeDemoNotifications(userId: string): Notification[] {
     {
       id: "demo-notif-3",
       type: "deposit",
-      title: "Depósito confirmado",
-      message: "Tu depósito de 100 USDT ha sido confirmado",
+      title: "Deposit confirmed",
+      message: "Your deposit of 100 USDT has been confirmed",
       timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
       read: true,
       link: "/dashboard/wallet",
@@ -155,8 +155,8 @@ function initializeDemoNotifications(userId: string): Notification[] {
     {
       id: "demo-notif-4",
       type: "info",
-      title: "Nuevo sorteo disponible",
-      message: "Participa en el Sorteo Diario #90 - Premio: 1000 USDT",
+      title: "New raffle available",
+      message: "Join Daily Draw #90 - Prize: 1000 USDT",
       timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
       read: true,
       link: "/dashboard/lottery",

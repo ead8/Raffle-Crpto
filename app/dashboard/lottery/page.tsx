@@ -63,7 +63,7 @@ export default function LotteryPage() {
               <Sparkles className="w-6 h-6 text-chart-2" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">{t("lottery.activeRaffles")}</p>
+              <p className="text-sm text-muted-foreground">{t("lottery.activeDraws")}</p>
               <p className="text-2xl font-bold">{activeLotteries.length}</p>
             </div>
           </div>
@@ -89,7 +89,7 @@ export default function LotteryPage() {
               <Clock className="w-6 h-6 text-chart-4" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">{t("lottery.upcomingRaffles")}</p>
+              <p className="text-sm text-muted-foreground">{t("lottery.upcomingDraws")}</p>
               <p className="text-2xl font-bold">{upcomingLotteries.length}</p>
             </div>
           </div>
@@ -209,7 +209,7 @@ export default function LotteryPage() {
                             <div className="flex items-center gap-3">
                               <Clock className="w-6 h-6 text-muted-foreground" />
                               <div>
-                                <p className="font-bold text-muted-foreground">{t("lottery.myTickets.raffleEnded")}</p>
+                                <p className="font-bold text-muted-foreground">{t("lottery.myTickets.drawEnded")}</p>
                                 <p className="text-sm text-muted-foreground">{t("lottery.myTickets.tryAgain")}</p>
                               </div>
                             </div>

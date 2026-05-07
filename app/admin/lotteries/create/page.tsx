@@ -28,7 +28,7 @@ export default function CreateLotteryPage() {
     autoRecreate: false,
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
@@ -37,7 +37,7 @@ export default function CreateLotteryPage() {
       const durationMs = Number.parseInt(formData.durationMinutes) * 60000
       const endTime = new Date(now.getTime() + durationMs)
 
-      createLottery({
+      await createLottery({
         title: formData.title,
         prizeAmount: Number.parseFloat(formData.prizeAmount),
         ticketPrice: Number.parseFloat(formData.ticketPrice),
@@ -52,7 +52,7 @@ export default function CreateLotteryPage() {
         const upcomingStartTime = new Date(endTime.getTime())
         const upcomingEndTime = new Date(upcomingStartTime.getTime() + durationMs)
 
-        createLottery({
+        await createLottery({
           title: formData.title,
           prizeAmount: Number.parseFloat(formData.prizeAmount),
           ticketPrice: Number.parseFloat(formData.ticketPrice),
@@ -65,17 +65,17 @@ export default function CreateLotteryPage() {
       }
 
       toast({
-        title: "Sorteo creado",
+        title: "Draw created",
         description: formData.autoRecreate
-          ? "Se han creado el sorteo activo y el próximo sorteo automáticamente"
-          : "El sorteo ha sido creado exitosamente",
+          ? "The active draw and the next draw have been created automatically"
+          : "The draw has been created successfully",
       })
 
       router.push("/admin/lotteries")
     } catch (error) {
       toast({
         title: "Error",
-        description: "Ocurrió un error al crear el sorteo",
+        description: error instanceof Error ? error.message : "Failed to create draw",
         variant: "destructive",
       })
     } finally {
@@ -90,21 +90,21 @@ export default function CreateLotteryPage() {
         className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Volver a sorteos
+        Back to draws
       </Link>
 
       <div>
-        <h1 className="text-3xl font-bold mb-2">Crear Nuevo Sorteo</h1>
-        <p className="text-muted-foreground">Configura los detalles del sorteo</p>
+        <h1 className="text-3xl font-bold mb-2">Create New Draw</h1>
+        <p className="text-muted-foreground">Configure draw details</p>
       </div>
 
       <form onSubmit={handleSubmit}>
         <Card className="glass-card border-primary/20 p-8 space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Título del Sorteo</Label>
+            <Label htmlFor="title">Draw Title</Label>
             <Input
               id="title"
-              placeholder="Ej: Sorteo Mega Premium"
+              placeholder="Ex: Mega Premium Draw"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
@@ -114,7 +114,7 @@ export default function CreateLotteryPage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="prizeAmount">Premio (USDT)</Label>
+              <Label htmlFor="prizeAmount">Prize (USDT)</Label>
               <Input
                 id="prizeAmount"
                 type="number"
@@ -128,7 +128,7 @@ export default function CreateLotteryPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ticketPrice">Precio por Ticket (USDT)</Label>
+              <Label htmlFor="ticketPrice">Price per Ticket (USDT)</Label>
               <Input
                 id="ticketPrice"
                 type="number"
@@ -144,7 +144,7 @@ export default function CreateLotteryPage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="maxTickets">Máximo de Tickets</Label>
+              <Label htmlFor="maxTickets">Maximum Tickets</Label>
               <Input
                 id="maxTickets"
                 type="number"
@@ -157,7 +157,7 @@ export default function CreateLotteryPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="duration">Duración (minutos)</Label>
+              <Label htmlFor="duration">Duration (minutes)</Label>
               <Input
                 id="duration"
                 type="number"
@@ -181,23 +181,23 @@ export default function CreateLotteryPage() {
               <div className="flex-1">
                 <label htmlFor="autoRecreate" className="text-sm font-semibold cursor-pointer flex items-center gap-2">
                   <RefreshCw className="w-4 h-4 text-primary" />
-                  Recrear automáticamente
+                  Auto-recreate
                 </label>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Cuando este sorteo termine, se creará automáticamente uno nuevo con la misma configuración
+                  When this draw ends, a new one will be created automatically with the same settings
                 </p>
               </div>
             </div>
           </div>
 
           <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-            <h3 className="font-semibold mb-2">Resumen</h3>
+            <h3 className="font-semibold mb-2">Summary</h3>
             <div className="space-y-1 text-sm">
               <p className="text-muted-foreground">
-                Premio total: <span className="text-primary font-semibold">{formData.prizeAmount || "0"} USDT</span>
+                Total prize: <span className="text-primary font-semibold">{formData.prizeAmount || "0"} USDT</span>
               </p>
               <p className="text-muted-foreground">
-                Ingresos potenciales:{" "}
+                Potential revenue:{" "}
                 <span className="text-primary font-semibold">
                   {(
                     Number.parseFloat(formData.ticketPrice || "0") * Number.parseInt(formData.maxTickets || "0")
@@ -206,12 +206,12 @@ export default function CreateLotteryPage() {
                 </span>
               </p>
               <p className="text-muted-foreground">
-                Duración: <span className="text-primary font-semibold">{formData.durationMinutes} minutos</span>
+                Duration: <span className="text-primary font-semibold">{formData.durationMinutes} minutes</span>
               </p>
               <p className="text-muted-foreground">
-                Recreación automática:{" "}
+                Auto-recreation:{" "}
                 <span className={`font-semibold ${formData.autoRecreate ? "text-green-500" : "text-muted-foreground"}`}>
-                  {formData.autoRecreate ? "Activada" : "Desactivada"}
+                  {formData.autoRecreate ? "Enabled" : "Disabled"}
                 </span>
               </p>
             </div>
@@ -220,11 +220,11 @@ export default function CreateLotteryPage() {
           <div className="flex gap-4">
             <Button type="submit" disabled={loading} className="flex-1 bg-primary hover:bg-primary/90 glow-effect">
               <Save className="w-4 h-4 mr-2" />
-              {loading ? "Creando..." : "Crear Sorteo"}
+              {loading ? "Creating..." : "Create Draw"}
             </Button>
             <Link href="/admin/lotteries" className="flex-1">
               <Button type="button" variant="outline" className="w-full border-primary/30 bg-transparent">
-                Cancelar
+                Cancel
               </Button>
             </Link>
           </div>

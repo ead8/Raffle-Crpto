@@ -69,14 +69,14 @@ export interface TimeSeriesData {
 }
 
 // Get analytics data
-export function getAnalyticsData(): AnalyticsData {
+export async function getAnalyticsData(): Promise<AnalyticsData> {
   if (typeof window === "undefined") {
     return getEmptyAnalytics()
   }
 
   const users = getAllUsers()
   const transactions = getAllTransactions()
-  const lotteries = getLotteries()
+  const lotteries = await getLotteries().catch(() => [] as Lottery[])
   const referrals = getAllReferrals()
   const results = getResults()
 

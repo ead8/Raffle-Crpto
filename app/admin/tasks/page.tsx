@@ -77,7 +77,7 @@ const TaskDialog = ({
         <div className="space-y-6">
           {/* Basic Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Información Básica</h3>
+            <h3 className="text-lg font-semibold">Basic Information</h3>
 
             <div className="space-y-2">
               <Label htmlFor="title">{t("admin.tasks.taskTitle")}</Label>
@@ -254,7 +254,7 @@ const TaskDialog = ({
           <div className="space-y-4 p-4 rounded-lg bg-muted/50 border border-muted">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              Período de Validez
+              Validity Period
             </h3>
 
             <div className="grid grid-cols-2 gap-4">

@@ -54,6 +54,9 @@ export default function AdminUsersPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [newBalance, setNewBalance] = useState("")
   const [newBonusBalance, setNewBonusBalance] = useState("")
+  const [selectedUserTickets, setSelectedUserTickets] = useState<
+    Awaited<ReturnType<typeof getUserTickets>>
+  >([])
 
   useEffect(() => {
     loadUsers()
@@ -90,9 +93,15 @@ export default function AdminUsersPage() {
       }
     })
 
-  const handleViewDetails = (user: User) => {
+  const handleViewDetails = async (user: User) => {
     setSelectedUser(user)
     setShowDetailsDialog(true)
+    try {
+      const tickets = await getUserTickets(user.id)
+      setSelectedUserTickets(tickets)
+    } catch {
+      setSelectedUserTickets([])
+    }
   }
 
   const handleEditBalance = (user: User) => {
@@ -155,9 +164,6 @@ export default function AdminUsersPage() {
     return getTransactions(userId)
   }
 
-  const getUserTicketsData = (userId: string) => {
-    return getUserTickets(userId)
-  }
 
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
@@ -224,16 +230,16 @@ export default function AdminUsersPage() {
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
             <Select value={filterOption} onValueChange={setFilterOption}>
               <SelectTrigger className="pl-10 pr-4 w-full sm:w-[200px] bg-secondary/50 border-primary/20 focus:border-primary">
-                <SelectValue placeholder="Filtrar..." />
+                <SelectValue placeholder="Filter..." />
               </SelectTrigger>
               <SelectContent className="glass-card border-primary/30">
-                <SelectItem value="none">Sin filtro</SelectItem>
-                <SelectItem value="balance-high">Mayor balance</SelectItem>
-                <SelectItem value="balance-low">Menor balance</SelectItem>
-                <SelectItem value="newest">Más nuevos</SelectItem>
-                <SelectItem value="oldest">Más antiguos</SelectItem>
-                <SelectItem value="active">Solo activos</SelectItem>
-                <SelectItem value="suspended">Solo suspendidos</SelectItem>
+                <SelectItem value="none">No filter</SelectItem>
+                <SelectItem value="balance-high">Highest balance</SelectItem>
+                <SelectItem value="balance-low">Lowest balance</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="active">Active only</SelectItem>
+                <SelectItem value="suspended">Suspended only</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -263,7 +269,7 @@ export default function AdminUsersPage() {
                     )}
                     {user.status === "suspended" && (
                       <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-red-500/20 text-red-500">
-                        Suspendido
+                        Suspended
                       </span>
                     )}
                   </div>
@@ -282,11 +288,11 @@ export default function AdminUsersPage() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Users className="w-3 h-3 shrink-0" />
-                      {user.referralCount || 0} referidos
+                      {user.referralCount || 0} referrals
                     </span>
                     <span className="hidden lg:flex items-center gap-1">
                       <Calendar className="w-3 h-3 shrink-0" />
-                      {new Date(user.createdAt).toLocaleDateString("es-ES")}
+                      {new Date(user.createdAt).toLocaleDateString("en-US")}
                     </span>
                   </div>
                 </div>
@@ -307,8 +313,8 @@ export default function AdminUsersPage() {
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass-card border-primary/30 w-[95vw] sm:w-full">
           <DialogHeader>
-            <DialogTitle className="text-xl sm:text-2xl">Detalles del Usuario</DialogTitle>
-            <DialogDescription className="text-sm">Información completa y acciones disponibles</DialogDescription>
+            <DialogTitle className="text-xl sm:text-2xl">User Details</DialogTitle>
+            <DialogDescription className="text-sm">Complete info and available actions</DialogDescription>
           </DialogHeader>
 
           {selectedUser && (
@@ -324,7 +330,7 @@ export default function AdminUsersPage() {
                   Tickets
                 </TabsTrigger>
                 <TabsTrigger value="actions" className="text-xs sm:text-sm">
-                  Acciones
+                  Actions
                 </TabsTrigger>
               </TabsList>
 
@@ -350,7 +356,7 @@ export default function AdminUsersPage() {
                           selectedUser.status === "active" ? "bg-chart-2/20 text-chart-2" : "bg-red-500/20 text-red-500"
                         }`}
                       >
-                        {selectedUser.status === "active" ? "Activo" : "Suspendido"}
+                        {selectedUser.status === "active" ? "Active" : "Suspended"}
                       </span>
                     </div>
                   </div>
@@ -474,7 +480,7 @@ export default function AdminUsersPage() {
               </TabsContent>
 
               <TabsContent value="tickets" className="space-y-3 mt-4">
-                {getUserTicketsData(selectedUser.id).map((ticket) => (
+                {selectedUserTickets.map((ticket) => (
                   <div
                     key={ticket.id}
                     className="p-3 sm:p-4 rounded-lg bg-secondary/30 border border-primary/10 space-y-2"
@@ -505,7 +511,7 @@ export default function AdminUsersPage() {
                     </p>
                   </div>
                 ))}
-                {getUserTicketsData(selectedUser.id).length === 0 && (
+                {selectedUserTickets.length === 0 && (
                   <p className="text-center text-muted-foreground py-8 text-sm">No hay tickets</p>
                 )}
               </TabsContent>
@@ -556,12 +562,12 @@ export default function AdminUsersPage() {
                       disabled={selectedUser.role === "admin"}
                     >
                       <Trash2 className="w-4 h-4" />
-                      Eliminar Usuario
+                      Delete User
                     </Button>
                   </div>
 
                   {selectedUser.role === "admin" && (
-                    <p className="text-xs text-muted-foreground">* No se pueden eliminar cuentas de administrador</p>
+                    <p className="text-xs text-muted-foreground">* Admin accounts cannot be deleted</p>
                   )}
                 </Card>
               </TabsContent>
@@ -573,12 +579,12 @@ export default function AdminUsersPage() {
       <Dialog open={showEditBalanceDialog} onOpenChange={setShowEditBalanceDialog}>
         <DialogContent className="glass-card border-primary/30 w-[95vw] sm:w-full max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">Editar Balance</DialogTitle>
-            <DialogDescription className="text-sm">Actualiza el balance de {selectedUser?.name}</DialogDescription>
+            <DialogTitle className="text-lg sm:text-xl">Edit Balance</DialogTitle>
+            <DialogDescription className="text-sm">Update {selectedUser?.name}'s balance</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label className="text-sm">Balance Regular Actual</Label>
+              <Label className="text-sm">Current Regular Balance</Label>
               <p className="text-xl sm:text-2xl font-bold text-primary">{selectedUser?.balance.toFixed(2)} USDT</p>
             </div>
             <div className="space-y-2">
@@ -618,10 +624,10 @@ export default function AdminUsersPage() {
           </div>
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setShowEditBalanceDialog(false)} className="w-full sm:w-auto">
-              Cancelar
+              Cancel
             </Button>
             <Button onClick={handleSaveBalance} className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
-              Guardar
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -630,17 +636,17 @@ export default function AdminUsersPage() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent className="glass-card border-primary/30 w-[95vw] sm:w-full max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">Confirmar Eliminación</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">Confirm Deletion</DialogTitle>
             <DialogDescription className="text-sm">
-              ¿Estás seguro de que deseas eliminar a {selectedUser?.name}? Esta acción no se puede deshacer.
+              Are you sure you want to delete {selectedUser?.name}? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setShowDeleteDialog(false)} className="w-full sm:w-auto">
-              Cancelar
+              Cancel
             </Button>
             <Button onClick={handleDeleteUser} variant="destructive" className="w-full sm:w-auto">
-              Eliminar
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>

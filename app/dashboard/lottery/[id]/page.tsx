@@ -29,22 +29,36 @@ export default function LotteryDetailPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const loadLottery = () => {
-      const lotteryData = getLotteryById(params.id as string)
-      setLottery(lotteryData)
+    let cancelled = false
+    const loadLottery = async () => {
+      try {
+        const lotteryData = await getLotteryById(params.id as string)
+        if (!cancelled) setLottery(lotteryData)
+      } catch (e) {
+        if (!cancelled) {
+          toast({
+            title: "Error",
+            description: e instanceof Error ? e.message : "Failed to load draw",
+            variant: "destructive",
+          })
+        }
+      }
     }
 
     loadLottery()
     const interval = setInterval(loadLottery, 5000)
 
-    return () => clearInterval(interval)
-  }, [params.id])
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [params.id, toast])
 
   if (!lottery || !user) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card className="glass-card border-primary/20 p-12 text-center">
-          <p className="text-muted-foreground">Cargando sorteo...</p>
+          <p className="text-muted-foreground">Loading draw...</p>
         </Card>
       </div>
     )
@@ -56,11 +70,11 @@ export default function LotteryDetailPage() {
   const maxPurchase = Math.min(availableTickets, Math.floor(user.balance / lottery.ticketPrice))
   const progress = (lottery.soldTickets / lottery.maxTickets) * 100
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     if (!canAfford) {
       toast({
-        title: "Fondos insuficientes",
-        description: "No tienes suficiente balance para esta compra",
+        title: "Insufficient funds",
+        description: "You don't have enough balance for this purchase",
         variant: "destructive",
       })
       return
@@ -68,8 +82,8 @@ export default function LotteryDetailPage() {
 
     if (ticketCount > availableTickets) {
       toast({
-        title: "Tickets no disponibles",
-        description: "No hay suficientes tickets disponibles",
+        title: "Tickets unavailable",
+        description: "There aren't enough tickets available",
         variant: "destructive",
       })
       return
@@ -78,31 +92,30 @@ export default function LotteryDetailPage() {
     setLoading(true)
 
     try {
-      const ticketNumbers = purchaseTickets(lottery.id, user.id, user.name, ticketCount)
+      const ticketNumbers = await purchaseTickets(lottery.id, user.id, user.name, ticketCount)
 
       addTransaction(user.id, {
         type: "ticket_purchase",
         amount: totalCost,
-        description: `Compra de ${ticketCount} ticket(s) - ${lottery.title}`,
+        description: `Purchase of ${ticketCount} ticket(s) - ${lottery.title}`,
         status: "completed",
       })
 
       updateUserBalance(user.id, user.balance - totalCost)
-      refreshAuth()
+      await refreshAuth()
 
       toast({
-        title: "Compra exitosa",
-        description: `Has comprado ${ticketCount} ticket(s). Números: ${ticketNumbers.join(", ")}`,
+        title: "Purchase successful",
+        description: `You've bought ${ticketCount} ticket(s). Numbers: ${ticketNumbers.join(", ")}`,
       })
 
-      // Refresh lottery data
-      const updatedLottery = getLotteryById(lottery.id)
+      const updatedLottery = await getLotteryById(lottery.id)
       setLottery(updatedLottery)
       setTicketCount(1)
     } catch (error) {
       toast({
         title: "Error",
-        description: "Ocurrió un error al procesar la compra",
+        description: error instanceof Error ? error.message : "Purchase failed",
         variant: "destructive",
       })
     } finally {
@@ -119,7 +132,7 @@ export default function LotteryDetailPage() {
         className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Volver a sorteos
+        Back to draws
       </Link>
 
       <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
@@ -138,14 +151,14 @@ export default function LotteryDetailPage() {
               </div>
               {lottery.status === "active" && (
                 <div className="px-4 py-2 rounded-full bg-chart-2/20 border border-chart-2/30 animate-pulse">
-                  <span className="text-sm font-semibold text-chart-2">En Vivo</span>
+                  <span className="text-sm font-semibold text-chart-2">Live</span>
                 </div>
               )}
             </div>
 
             {lottery.status === "active" && (
               <div className="p-4 rounded-lg bg-accent/10 border border-accent/20 mb-6">
-                <p className="text-sm text-muted-foreground mb-2">Tiempo restante para participar</p>
+                <p className="text-sm text-muted-foreground mb-2">Time remaining to participate</p>
                 <CountdownTimer endTime={lottery.endTime} />
               </div>
             )}
@@ -162,7 +175,7 @@ export default function LotteryDetailPage() {
               <div className="p-4 rounded-lg bg-secondary/30 border border-primary/10">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Participantes</span>
+                  <span className="text-sm text-muted-foreground">Participants</span>
                 </div>
                 <p className="text-2xl font-bold">{lottery.participants.length}</p>
               </div>
@@ -170,7 +183,7 @@ export default function LotteryDetailPage() {
               <div className="p-4 rounded-lg bg-secondary/30 border border-primary/10">
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Tickets Vendidos</span>
+                  <span className="text-sm text-muted-foreground">Tickets Sold</span>
                 </div>
                 <p className="text-2xl font-bold">{lottery.soldTickets}</p>
               </div>
@@ -178,7 +191,7 @@ export default function LotteryDetailPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Progreso de venta</span>
+                <span className="text-muted-foreground">Sale progress</span>
                 <span className="font-semibold">
                   {lottery.soldTickets} / {lottery.maxTickets} tickets
                 </span>
@@ -189,16 +202,16 @@ export default function LotteryDetailPage() {
 
           {/* How it Works */}
           <Card className="glass-card border-primary/20 p-6">
-            <h2 className="text-xl font-bold mb-4">¿Cómo funciona?</h2>
+            <h2 className="text-xl font-bold mb-4">How does it work?</h2>
             <div className="space-y-4">
               <div className="flex gap-4">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                   <span className="text-sm font-bold text-primary">1</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Compra tus tickets</h3>
+                  <h3 className="font-semibold mb-1">Buy your tickets</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Selecciona cuántos tickets quieres comprar. Cada ticket aumenta tus probabilidades de ganar.
+                    Select how many tickets you want to buy. Each ticket increases your chances of winning.
                   </p>
                 </div>
               </div>
@@ -208,10 +221,9 @@ export default function LotteryDetailPage() {
                   <span className="text-sm font-bold text-primary">2</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Espera el sorteo</h3>
+                  <h3 className="font-semibold mb-1">Wait for the draw</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    El sorteo se realiza automáticamente cuando termina el tiempo. El sistema selecciona un ganador al
-                    azar.
+                    The draw runs automatically when time runs out. The system picks a winner at random.
                   </p>
                 </div>
               </div>
@@ -221,9 +233,9 @@ export default function LotteryDetailPage() {
                   <span className="text-sm font-bold text-primary">3</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Recibe tu premio</h3>
+                  <h3 className="font-semibold mb-1">Receive your prize</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Si ganas, el premio se deposita automáticamente en tu billetera. Sin esperas ni complicaciones.
+                    If you win, your prize is deposited automatically into your wallet. No waiting, no friction.
                   </p>
                 </div>
               </div>
@@ -233,7 +245,7 @@ export default function LotteryDetailPage() {
           {/* Participants */}
           {lottery.participants.length > 0 && (
             <Card className="glass-card border-primary/20 p-6">
-              <h2 className="text-xl font-bold mb-4">Participantes ({lottery.participants.length})</h2>
+              <h2 className="text-xl font-bold mb-4">Participants ({lottery.participants.length})</h2>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {lottery.participants.map((participant, index) => (
                   <div key={participant.userId} className="p-4 rounded-lg bg-secondary/30 border border-primary/10">
@@ -249,12 +261,12 @@ export default function LotteryDetailPage() {
                       </div>
                       {participant.userId === user.id && (
                         <span className="text-xs px-2 py-1 rounded-full bg-primary/20 text-primary font-semibold">
-                          Tú
+                          You
                         </span>
                       )}
                     </div>
                     <div className="mt-2 p-2 rounded bg-background/50 border border-primary/10">
-                      <p className="text-xs text-muted-foreground mb-1">Números de tickets:</p>
+                      <p className="text-xs text-muted-foreground mb-1">Ticket numbers:</p>
                       <div className="flex flex-wrap gap-1">
                         {participant.ticketNumbers.map((ticketNum) => (
                           <span
@@ -281,16 +293,16 @@ export default function LotteryDetailPage() {
         {/* Purchase Panel */}
         <div className="space-y-6">
           <Card className="glass-card border-primary/30 p-6 lg:sticky lg:top-20">
-            <h2 className="text-xl font-bold mb-6">Comprar Tickets</h2>
+            <h2 className="text-xl font-bold mb-6">Buy Tickets</h2>
 
             {lottery.status === "active" ? (
               <div className="space-y-6">
                 {userParticipation && (
                   <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                    <p className="text-sm text-muted-foreground mb-1">Tus tickets actuales</p>
+                    <p className="text-sm text-muted-foreground mb-1">Your current tickets</p>
                     <p className="text-2xl font-bold text-primary mb-2">{userParticipation.ticketCount}</p>
                     <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Tus números:</p>
+                      <p className="text-xs text-muted-foreground">Your numbers:</p>
                       <div className="flex flex-wrap gap-1">
                         {userParticipation.ticketNumbers.map((n) => (
                           <span
@@ -306,7 +318,7 @@ export default function LotteryDetailPage() {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="ticket-count">Cantidad de tickets</Label>
+                  <Label htmlFor="ticket-count">Number of tickets</Label>
                   <Input
                     id="ticket-count"
                     type="number"
@@ -318,7 +330,7 @@ export default function LotteryDetailPage() {
                     }
                     className="bg-secondary/50 border-primary/20 focus:border-primary text-lg"
                   />
-                  <p className="text-xs text-muted-foreground">Máximo disponible: {maxPurchase} tickets</p>
+                  <p className="text-xs text-muted-foreground">Max available: {maxPurchase} tickets</p>
                 </div>
 
                 <div className="space-y-3">
@@ -327,7 +339,7 @@ export default function LotteryDetailPage() {
                     <span className="font-semibold">{lottery.ticketPrice} USDT</span>
                   </div>
                   <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">
-                    <span className="text-sm text-muted-foreground">Cantidad</span>
+                    <span className="text-sm text-muted-foreground">Quantity</span>
                     <span className="font-semibold">{ticketCount}</span>
                   </div>
                   <div className="flex items-center justify-between p-4 rounded-lg bg-primary/10 border border-primary/20">
@@ -337,7 +349,7 @@ export default function LotteryDetailPage() {
                 </div>
 
                 <div className="p-3 rounded-lg bg-secondary/30 border border-primary/10">
-                  <p className="text-xs text-muted-foreground mb-1">Tu balance</p>
+                  <p className="text-xs text-muted-foreground mb-1">Your balance</p>
                   <p className="text-lg font-bold">{user.balance.toFixed(2)} USDT</p>
                 </div>
 
@@ -347,27 +359,27 @@ export default function LotteryDetailPage() {
                   className="w-full bg-primary hover:bg-primary/90 text-white glow-effect py-6 text-lg"
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  {loading ? "Procesando..." : !canAfford ? "Fondos Insuficientes" : "Comprar Tickets"}
+                  {loading ? "Processing..." : !canAfford ? "Insufficient Funds" : "Buy Tickets"}
                 </Button>
 
                 {!canAfford && (
                   <Link href="/dashboard/wallet">
                     <Button variant="outline" className="w-full border-primary/30 hover:bg-primary/10 bg-transparent">
                       <Zap className="w-4 h-4 mr-2" />
-                      Depositar Fondos
+                      Deposit Funds
                     </Button>
                   </Link>
                 )}
               </div>
             ) : lottery.status === "upcoming" ? (
               <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">Este sorteo aún no ha comenzado</p>
+                <p className="text-muted-foreground mb-4">This draw hasn't started yet</p>
                 <CountdownTimer endTime={lottery.startTime} />
               </div>
             ) : (
               <div className="text-center py-8">
                 <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                <p className="text-muted-foreground">Este sorteo ha finalizado</p>
+                <p className="text-muted-foreground">This draw has ended</p>
               </div>
             )}
           </Card>

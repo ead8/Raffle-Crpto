@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Fraunces, IBM_Plex_Sans } from "next/font/google"
 import { AuthProvider } from "@/components/auth-provider"
 import { I18nProvider } from "@/lib/i18n"
+import { ComplianceModal } from "@/components/compliance-modal"
 import "./globals.css"
 
 const fraunces = Fraunces({
@@ -18,7 +19,7 @@ const ibmSans = IBM_Plex_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "Raffle USDT — Hourly USDT raffles",
+  title: "Drixx — Hourly USDT raffles",
   description: "Buy tickets, join hourly raffles, and win USDT with transparent draws and fast payouts.",
   generator: "v0.app",
   icons: {
@@ -37,7 +38,10 @@ export default function RootLayout({
     <html lang="en" className={`${fraunces.variable} ${ibmSans.variable}`}>
       <body className="font-sans antialiased min-h-screen">
         <I18nProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <ComplianceModal />
+            {children}
+          </AuthProvider>
         </I18nProvider>
       </body>
     </html>

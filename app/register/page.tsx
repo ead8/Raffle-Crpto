@@ -12,11 +12,10 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { UserPlus, ArrowLeft, Check, Eye, EyeOff, X, Gift } from "lucide-react"
+import { UserPlus, ArrowLeft, Check, Eye, EyeOff, X, Gift, Mail } from "lucide-react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { useI18n } from "@/lib/i18n"
-import { VerificationCodeInput } from "@/components/verification-code-input"
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("")
@@ -27,10 +26,8 @@ export default function RegisterPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [showVerification, setShowVerification] = useState(false)
-  const [verificationCode, setVerificationCode] = useState("")
-  const [resendTimer, setResendTimer] = useState(60)
-  const { setAuth } = useAuth()
+  const [emailSent, setEmailSent] = useState(false)
+  const { refreshAuth } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
   const { t } = useI18n()
@@ -96,81 +93,35 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setShowVerification(true)
-      setResendTimer(60)
-      toast({
-        title: t("verification.codeSent"),
-        description: t("verification.codeSent.desc"),
-      })
-    } catch (error) {
-      toast({
-        title: t("register.error"),
-        description: t("register.error.desc"),
-        variant: "destructive",
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+      const result = await register(email, password, name)
 
-  const handleVerifyCode = async (code: string) => {
-    setLoading(true)
+      if (result.needsEmailConfirmation) {
+        setEmailSent(true)
+        toast({
+          title: t("verification.codeSent"),
+          description: t("verification.codeSent.desc"),
+        })
+        return
+      }
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      if (code.length === 6) {
-        const user = register(email, password, name)
-
+      if (result.user) {
         if (referralCode && referralValid) {
           const referrerId = validateReferralCode(referralCode)
           if (referrerId) {
-            createReferral(referrerId, user.id, referralCode)
+            createReferral(referrerId, result.user.id, referralCode)
           }
         }
-
-        setAuth(user)
-        toast({
-          title: t("verification.success"),
-          description: t("verification.success.desc"),
-        })
+        await refreshAuth()
         toast({
           title: t("register.success"),
-          description: t("register.success.desc", { name: user.name }),
+          description: t("register.success.desc", { name: result.user.name }),
         })
         router.push("/dashboard")
-      } else {
-        throw new Error("Invalid code")
       }
     } catch (error) {
       toast({
-        title: t("verification.error"),
-        description: t("verification.error.desc"),
-        variant: "destructive",
-      })
-      setVerificationCode("")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleResendCode = async () => {
-    if (resendTimer > 0) return
-
-    setLoading(true)
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setResendTimer(60)
-      setVerificationCode("")
-      toast({
-        title: t("verification.codeSent"),
-        description: t("verification.codeSent.desc"),
-      })
-    } catch (error) {
-      toast({
         title: t("register.error"),
-        description: t("register.error.desc"),
+        description: error instanceof Error ? error.message : t("register.error.desc"),
         variant: "destructive",
       })
     } finally {
@@ -178,7 +129,7 @@ export default function RegisterPage() {
     }
   }
 
-  if (showVerification) {
+  if (emailSent) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0a1f1a] via-[#0d1b16] to-[#0a1410] relative overflow-hidden flex items-center justify-center p-4">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -186,60 +137,20 @@ export default function RegisterPage() {
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#50AF95] rounded-full blur-[120px] opacity-20 animate-pulse delay-1000"></div>
         </div>
 
-        <Card className="glass-card border-primary/30 p-8 w-full max-w-md relative z-10">
-          <button
-            onClick={() => setShowVerification(false)}
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {t("register.backToHome")}
-          </button>
-
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-2">{t("verification.title")}</h1>
-            <p className="text-sm text-muted-foreground leading-relaxed">{t("verification.subtitle", { email })}</p>
+        <Card className="glass-card border-primary/30 p-8 w-full max-w-md relative z-10 text-center">
+          <div className="w-16 h-16 mx-auto rounded-full bg-primary/20 flex items-center justify-center mb-6">
+            <Mail className="w-8 h-8 text-primary" />
           </div>
-
-          <div className="space-y-6">
-            <VerificationCodeInput
-              length={6}
-              value={verificationCode}
-              onChange={setVerificationCode}
-              onComplete={handleVerifyCode}
-            />
-
-            <div className="text-center text-sm text-muted-foreground">
-              {resendTimer > 0 ? (
-                <p>{t("verification.resend", { seconds: resendTimer })}</p>
-              ) : (
-                <button
-                  onClick={handleResendCode}
-                  disabled={loading}
-                  className="text-primary hover:underline disabled:opacity-50"
-                >
-                  {t("verification.resendNow")}
-                </button>
-              )}
-            </div>
-
-            <Button
-              onClick={() => handleVerifyCode(verificationCode)}
-              className="w-full bg-primary hover:bg-primary/90 text-white glow-effect"
-              disabled={loading || verificationCode.length !== 6}
-            >
-              {loading ? t("register.buttonLoading") : t("verification.confirm")}
+          <h1 className="text-2xl font-bold mb-2">{t("verification.title")}</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+            We sent a confirmation link to <span className="font-semibold text-foreground">{email}</span>.
+            Click the link in the email to activate your account, then come back and log in.
+          </p>
+          <Link href="/login">
+            <Button className="w-full bg-primary hover:bg-primary/90 text-white">
+              {t("login.button")}
             </Button>
-
-            <div className="text-center">
-              <button
-                onClick={handleResendCode}
-                disabled={resendTimer > 0 || loading}
-                className="text-sm text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {t("verification.notReceived")}
-              </button>
-            </div>
-          </div>
+          </Link>
         </Card>
       </div>
     )

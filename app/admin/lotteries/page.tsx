@@ -83,7 +83,7 @@ export default function AdminLotteriesPage() {
         <Link href="/admin/lotteries/create">
           <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
-            {t("admin.lotteries.createRaffle")}
+            {t("admin.lotteries.createDraw")}
           </Button>
         </Link>
       </div>

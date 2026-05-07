@@ -27,7 +27,7 @@ import { triggerSync } from "@/lib/sync"
 import { cn } from "@/lib/utils"
 
 export default function SettingsPage() {
-  const { user, setUser } = useAuth()
+  const { user, setAuth } = useAuth()
   const { t } = useI18n()
   const { toast } = useToast()
 
@@ -105,8 +105,7 @@ export default function SettingsPage() {
 
         // Update auth state
         const updatedUser = users[userIndex]
-        setUser(updatedUser)
-        localStorage.setItem("usdt_lottery_auth", JSON.stringify({ user: updatedUser, isAuthenticated: true }))
+        setAuth(updatedUser)
 
         triggerSync("users")
 
@@ -191,8 +190,8 @@ export default function SettingsPage() {
     const code = deleteVerificationCode.join("")
     if (code.length === 6) {
       toast({
-        title: "Cuenta eliminada",
-        description: "Tu cuenta ha sido eliminada exitosamente",
+        title: "Account deleted",
+        description: "Your account has been deleted successfully",
         variant: "destructive",
       })
       setShow2FAVerifyDelete(false)
@@ -200,7 +199,7 @@ export default function SettingsPage() {
     } else {
       toast({
         title: "Error",
-        description: "Por favor ingresa un código válido de 6 dígitos",
+        description: "Please enter a valid 6-digit code",
         variant: "destructive",
       })
     }
@@ -257,8 +256,8 @@ export default function SettingsPage() {
     if (countdown === 0) {
       setCountdown(58)
       toast({
-        title: "Código reenviado",
-        description: "Se ha enviado un nuevo código a tu correo electrónico",
+        title: "Code resent",
+        description: "A new code has been sent to your email",
       })
     }
   }
@@ -279,24 +278,24 @@ export default function SettingsPage() {
   const handleCopyId = () => {
     navigator.clipboard.writeText((user.numericId || 999999).toString())
     toast({
-      title: "ID copiado",
-      description: "ID copiado al portapapeles",
+      title: "ID copied",
+      description: "ID copied to clipboard",
     })
   }
 
   const handle2FAToggle = () => {
     if (!twoFactorEnabled) {
       // Generate QR code when enabling 2FA
-      const email = "usuario@example.com"
-      const issuer = "USDT Sorteo"
+      const email = "user@example.com"
+      const issuer = "Drixx"
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(email)}?secret=${secretKey}&issuer=${encodeURIComponent(issuer)}`
       setQrCodeUrl(qrUrl)
       setShow2FASetup(true)
     } else {
       setTwoFactorEnabled(false)
       toast({
-        title: "2FA desactivado",
-        description: "La autenticación de dos factores ha sido desactivada",
+        title: "2FA disabled",
+        description: "Two-factor authentication has been disabled",
       })
     }
   }
@@ -307,13 +306,13 @@ export default function SettingsPage() {
       setShow2FASetup(false)
       setVerificationCode("")
       toast({
-        title: "2FA activado",
-        description: "La autenticación de dos factores ha sido configurada correctamente",
+        title: "2FA enabled",
+        description: "Two-factor authentication has been set up successfully",
       })
     } else {
       toast({
         title: "Error",
-        description: "Por favor ingresa un código de 6 dígitos válido",
+        description: "Please enter a valid 6-digit code",
         variant: "destructive",
       })
     }
@@ -322,8 +321,8 @@ export default function SettingsPage() {
   const copySecretKey = () => {
     navigator.clipboard.writeText(secretKey)
     toast({
-      title: "Copiado",
-      description: "Clave secreta copiada al portapapeles",
+      title: "Copied",
+      description: "Secret key copied to clipboard",
     })
   }
 
@@ -415,9 +414,9 @@ export default function SettingsPage() {
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-primary" />
-                <span className="font-medium">Autenticación de dos factores (2FA)</span>
+                <span className="font-medium">Two-factor authentication (2FA)</span>
               </div>
-              <p className="text-sm text-muted-foreground">Configura Google Authenticator para mayor seguridad</p>
+              <p className="text-sm text-muted-foreground">Set up Google Authenticator for extra security</p>
             </div>
             <button
               onClick={handle2FAToggle}
@@ -437,7 +436,7 @@ export default function SettingsPage() {
 
           {/* Password Change Section */}
           <div className="space-y-4">
-            <h3 className="text-base font-semibold">Cambiar Contraseña</h3>
+            <h3 className="text-base font-semibold">Change Password</h3>
 
             <div className="space-y-2">
               <Label htmlFor="current-password">{t("settings.security.currentPassword")}</Label>
@@ -546,8 +545,8 @@ export default function SettingsPage() {
         <div className="space-y-3 sm:space-y-4">
           <div className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-secondary/30 border border-primary/10">
             <div className="flex-1 pr-4">
-              <p className="text-sm sm:text-base font-medium">{t("settings.notifications.raffles")}</p>
-              <p className="text-xs sm:text-sm text-muted-foreground">{t("settings.notifications.raffles.desc")}</p>
+              <p className="text-sm sm:text-base font-medium">{t("settings.notifications.draws")}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">{t("settings.notifications.draws.desc")}</p>
             </div>
             <Switch checked={notifications.raffles} onCheckedChange={() => handleToggleNotification("raffles")} />
           </div>
@@ -650,15 +649,15 @@ export default function SettingsPage() {
       <AlertDialog open={showSaveProfileDialog} onOpenChange={setShowSaveProfileDialog}>
         <AlertDialogContent className="glass-card border-primary/30">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar cambios</AlertDialogTitle>
+            <AlertDialogTitle>Confirm changes</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que deseas guardar los cambios en tu perfil?
+              Are you sure you want to save the changes to your profile?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleSaveProfile} className="bg-primary hover:bg-primary/90">
-              Guardar cambios
+              Save changes
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -668,16 +667,15 @@ export default function SettingsPage() {
       <AlertDialog open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog}>
         <AlertDialogContent className="glass-card border-primary/30">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar cambio de contraseña</AlertDialogTitle>
+            <AlertDialogTitle>Confirm password change</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que deseas cambiar tu contraseña? Deberás usar la nueva contraseña en tu próximo inicio
-              de sesión.
+              Are you sure you want to change your password? You'll need to use the new password on your next login.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleChangePassword} className="bg-chart-1 hover:bg-chart-1/90">
-              Cambiar contraseña
+              Change password
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -687,16 +685,16 @@ export default function SettingsPage() {
       <AlertDialog open={showDeleteAccountDialog} onOpenChange={setShowDeleteAccountDialog}>
         <AlertDialogContent className="glass-card border-red-500/30">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-500">Eliminar cuenta</AlertDialogTitle>
+            <AlertDialogTitle className="text-red-500">Delete account</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminarán permanentemente todos tus datos, incluyendo tu balance,
-              historial de transacciones y participaciones en sorteos.
+              This action cannot be undone. All your data will be permanently deleted, including your balance,
+              transaction history, and raffle participation.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteAccount} className="bg-red-500 hover:bg-red-600">
-              Eliminar cuenta
+              Delete account
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -706,7 +704,7 @@ export default function SettingsPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-lg p-6 max-w-md w-full space-y-4 border border-border">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Verificación de seguridad</h2>
+              <h2 className="text-xl font-bold">Security verification</h2>
               <button
                 onClick={() => {
                   setShow2FAVerifyDelete(false)
@@ -721,7 +719,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-start gap-3 text-sm text-muted-foreground">
                 <Shield className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <p>Código de verificación de Google</p>
+                <p>Google verification code</p>
               </div>
 
               {/* 6-digit code input boxes */}
@@ -751,7 +749,7 @@ export default function SettingsPage() {
                   onClick={handleTroublesWithVerification}
                   className="text-sm text-primary hover:underline"
                 >
-                  ¿Tienes problemas con la verificación?
+                  Having trouble with verification?
                 </button>
               </div>
 
@@ -760,7 +758,7 @@ export default function SettingsPage() {
                 className="w-full bg-primary hover:bg-primary/90"
                 disabled={deleteVerificationCode.join("").length !== 6}
               >
-                Verificar y eliminar cuenta
+                Verify and delete account
               </Button>
             </div>
           </div>
@@ -771,7 +769,7 @@ export default function SettingsPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-lg p-6 max-w-md w-full space-y-4 border border-border">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Restablecer la configuración de seguridad</h2>
+              <h2 className="text-xl font-bold">Reset security configuration</h2>
               <button
                 onClick={() => setShowResetSecurity(false)}
                 className="text-muted-foreground hover:text-foreground"
@@ -782,11 +780,11 @@ export default function SettingsPage() {
 
             <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/10 border border-primary/20">
               <AlertCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-              <p className="text-sm">Google Authenticator no funciona. Me gustaría restablecerlo.</p>
+              <p className="text-sm">Google Authenticator isn't working. I'd like to reset it.</p>
             </div>
 
             <Button onClick={handleConfirmResetSecurity} className="w-full bg-primary hover:bg-primary/90">
-              Confirmar
+              Confirm
             </Button>
           </div>
         </div>
@@ -796,7 +794,7 @@ export default function SettingsPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-lg p-6 max-w-md w-full space-y-4 border border-border">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Verificación de seguridad</h2>
+              <h2 className="text-xl font-bold">Security verification</h2>
               <button
                 onClick={() => {
                   setShowEmailVerification(false)
@@ -812,7 +810,7 @@ export default function SettingsPage() {
               <div className="flex items-start gap-3 text-sm text-muted-foreground">
                 <Mail className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <p>
-                  Se enviará un código de verificación a{" "}
+                  A verification code will be sent to{" "}
                   <span className="font-medium text-foreground">
                     {email.slice(0, 3)}****{email.slice(email.indexOf("@"))}
                   </span>
@@ -850,7 +848,7 @@ export default function SettingsPage() {
                     countdown > 0 ? "text-muted-foreground cursor-not-allowed" : "text-primary",
                   )}
                 >
-                  ¿No puede recibir el código de verificación? {countdown > 0 && `${countdown}s`}
+                  Can't receive the verification code? {countdown > 0 && `${countdown}s`}
                 </button>
               </div>
             </div>
@@ -862,7 +860,7 @@ export default function SettingsPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-lg p-6 max-w-md w-full space-y-6 border border-border">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Configurar 2FA</h2>
+              <h2 className="text-xl font-bold">Set up 2FA</h2>
               <button
                 onClick={() => {
                   setShow2FASetup(false)
@@ -875,7 +873,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">Escanea el código QR con Google Authenticator</p>
+              <p className="text-sm text-muted-foreground">Scan the QR code with Google Authenticator</p>
 
               {/* QR Code */}
               <div className="flex justify-center p-4 bg-white rounded-lg">
@@ -884,7 +882,7 @@ export default function SettingsPage() {
 
               {/* Secret Key */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Clave secreta (manual)</Label>
+                <Label className="text-sm font-medium">Secret key (manual)</Label>
                 <div className="flex gap-2">
                   <Input value={secretKey} readOnly className="font-mono text-sm" />
                   <Button onClick={copySecretKey} variant="outline" size="icon">
@@ -895,10 +893,10 @@ export default function SettingsPage() {
 
               {/* Verification Code */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Código de verificación</Label>
+                <Label className="text-sm font-medium">Verification code</Label>
                 <Input
                   type="text"
-                  placeholder="Ingresa el código de 6 dígitos"
+                  placeholder="Enter the 6-digit code"
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                   maxLength={6}
@@ -907,7 +905,7 @@ export default function SettingsPage() {
               </div>
 
               <Button onClick={handleVerify2FA} className="w-full" disabled={verificationCode.length !== 6}>
-                Verificar y activar 2FA
+                Verify and enable 2FA
               </Button>
             </div>
           </div>

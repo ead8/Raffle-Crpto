@@ -211,18 +211,18 @@ export default function AdminReferralsPage() {
                       <Calendar className="w-3 h-3" />
                       {new Date(referral.createdAt).toLocaleDateString()}
                     </span>
-                    <span>Código: {referral.referralCode}</span>
+                    <span>Code: {referral.referralCode}</span>
                     <span>Email: {getUserEmail(referral.referredId)}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Bono</p>
+                    <p className="text-sm text-muted-foreground">Bonus</p>
                     <p className="font-bold text-accent">{referral.reward} USDT</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Comisión</p>
+                    <p className="text-sm text-muted-foreground">Commission</p>
                     <p className="font-bold text-chart-1">{referral.commissionEarned.toFixed(2)} USDT</p>
                   </div>
                   <div>

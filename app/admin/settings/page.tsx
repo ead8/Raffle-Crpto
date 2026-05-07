@@ -37,15 +37,15 @@ export default function AdminSettingsPage() {
             <Settings className="w-6 h-6 text-chart-2" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">Configuración de Sorteos</h2>
-            <p className="text-sm text-muted-foreground">Parámetros por defecto para nuevos sorteos</p>
+            <h2 className="text-xl font-bold">Draw Configuration</h2>
+            <p className="text-sm text-muted-foreground">Default parameters for new draws</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="default-duration">Duración por Defecto (minutos)</Label>
+              <Label htmlFor="default-duration">Default Duration (minutes)</Label>
               <Input
                 id="default-duration"
                 type="number"
@@ -56,7 +56,7 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="min-ticket-price">Precio Mínimo de Ticket (USDT)</Label>
+              <Label htmlFor="min-ticket-price">Minimum Ticket Price (USDT)</Label>
               <Input
                 id="min-ticket-price"
                 type="number"
@@ -70,7 +70,7 @@ export default function AdminSettingsPage() {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="max-tickets-per-user">Máximo Tickets por Usuario</Label>
+              <Label htmlFor="max-tickets-per-user">Maximum Tickets per User</Label>
               <Input
                 id="max-tickets-per-user"
                 type="number"
@@ -81,7 +81,7 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="auto-start">Inicio Automático de Sorteos</Label>
+              <Label htmlFor="auto-start">Automatic Draw Start</Label>
               <Switch
                 id="auto-start"
                 checked={lotterySettings.autoStartEnabled}
@@ -100,15 +100,15 @@ export default function AdminSettingsPage() {
             <DollarSign className="w-6 h-6 text-accent" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">Configuración Financiera</h2>
-            <p className="text-sm text-muted-foreground">Comisiones y límites de transacciones</p>
+            <h2 className="text-xl font-bold">Financial Configuration</h2>
+            <p className="text-sm text-muted-foreground">Fees and transaction limits</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="platform-fee">Comisión de Plataforma (%)</Label>
+              <Label htmlFor="platform-fee">Platform Fee (%)</Label>
               <Input
                 id="platform-fee"
                 type="number"
@@ -119,7 +119,7 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="withdrawal-fee">Comisión de Retiro (USDT)</Label>
+              <Label htmlFor="withdrawal-fee">Withdrawal Fee (USDT)</Label>
               <Input
                 id="withdrawal-fee"
                 type="number"
@@ -132,7 +132,7 @@ export default function AdminSettingsPage() {
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="min-deposit">Depósito Mínimo (USDT)</Label>
+              <Label htmlFor="min-deposit">Minimum Deposit (USDT)</Label>
               <Input
                 id="min-deposit"
                 type="number"
@@ -143,7 +143,7 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="min-withdrawal">Retiro Mínimo (USDT)</Label>
+              <Label htmlFor="min-withdrawal">Minimum Withdrawal (USDT)</Label>
               <Input
                 id="min-withdrawal"
                 type="number"
@@ -163,19 +163,19 @@ export default function AdminSettingsPage() {
             <Shield className="w-6 h-6 text-chart-1" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">Seguridad de Usuarios</h2>
-            <p className="text-sm text-muted-foreground">Configuración de seguridad y verificación para usuarios</p>
+            <h2 className="text-xl font-bold">User Security</h2>
+            <p className="text-sm text-muted-foreground">Security and verification settings for users</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/30 border border-primary/10">
             <div>
-              <p className="font-medium">Verificación de Email</p>
-              <p className="text-sm text-muted-foreground">Requiere verificación de email para nuevos usuarios</p>
+              <p className="font-medium">Email Verification</p>
+              <p className="text-sm text-muted-foreground">Requires email verification for new users</p>
             </div>
             <Button variant="outline" size="sm" className="border-primary/30 bg-transparent">
-              Activado
+              Enabled
             </Button>
           </div>
 
@@ -185,9 +185,9 @@ export default function AdminSettingsPage() {
                 <Shield className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium">Autenticación de Dos Factores (Google Authenticator)</p>
+                <p className="font-medium">Two-Factor Authentication (Google Authenticator)</p>
                 <p className="text-sm text-muted-foreground">
-                  Los usuarios podrán activar 2FA con Google Authenticator después de iniciar sesión
+                  Users will be able to enable 2FA with Google Authenticator after logging in
                 </p>
               </div>
             </div>
@@ -197,17 +197,17 @@ export default function AdminSettingsPage() {
               className={`border-primary/30 ${twoFactorEnabled ? "bg-primary/20 text-primary" : "opacity-50 bg-transparent"}`}
               onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
             >
-              {twoFactorEnabled ? "Activado" : "Desactivado"}
+              {twoFactorEnabled ? "Enabled" : "Disabled"}
             </Button>
           </div>
 
           <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/30 border border-primary/10">
             <div>
-              <p className="font-medium">Límite de Intentos de Login</p>
-              <p className="text-sm text-muted-foreground">Bloqueo temporal después de 5 intentos fallidos</p>
+              <p className="font-medium">Login Attempt Limit</p>
+              <p className="text-sm text-muted-foreground">Temporary lockout after 5 failed attempts</p>
             </div>
             <Button variant="outline" size="sm" className="border-primary/30 bg-transparent">
-              Activado
+              Enabled
             </Button>
           </div>
         </div>
@@ -216,10 +216,10 @@ export default function AdminSettingsPage() {
       <div className="flex gap-4">
         <Button className="flex-1 bg-primary hover:bg-primary/90 glow-effect">
           <Save className="mr-2 h-4 w-4" />
-          Guardar Cambios
+          Save Changes
         </Button>
         <Button variant="outline" className="flex-1 border-primary/30 hover:bg-primary/10 bg-transparent">
-          Restablecer
+          Reset
         </Button>
       </div>
     </div>

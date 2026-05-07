@@ -22,16 +22,28 @@ export default function AdminPage() {
   const [recentLotteries, setRecentLotteries] = useState<any[]>([])
 
   useEffect(() => {
-    const loadData = () => {
-      setStats(getAdminStats())
-      const lotteries = getLotteries()
-      setRecentLotteries(lotteries.slice(0, 5))
+    let cancelled = false
+    const loadData = async () => {
+      try {
+        const [adminStats, lotteries] = await Promise.all([
+          Promise.resolve(getAdminStats()),
+          getLotteries(),
+        ])
+        if (cancelled) return
+        setStats(adminStats)
+        setRecentLotteries(lotteries.slice(0, 5))
+      } catch {
+        // ignore — page will retry on next interval
+      }
     }
 
     loadData()
     const interval = setInterval(loadData, 5000)
 
-    return () => clearInterval(interval)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
   }, [])
 
   const statCards = [
@@ -45,7 +57,7 @@ export default function AdminPage() {
       href: "/admin/users",
     },
     {
-      label: t("admin.dashboard.activeRaffles"),
+      label: t("admin.dashboard.activeDraws"),
       value: stats.activeLotteries,
       icon: Activity,
       color: "text-chart-2",
@@ -84,7 +96,7 @@ export default function AdminPage() {
         <Link href="/admin/lotteries/create">
           <Button className="bg-primary hover:bg-primary/90 glow-effect">
             <Zap className="w-4 h-4 mr-2" />
-            {t("admin.dashboard.createRaffle")}
+            {t("admin.dashboard.createDraw")}
           </Button>
         </Link>
       </div>
@@ -163,7 +175,7 @@ export default function AdminPage() {
       {/* Recent Lotteries */}
       <Card className="glass-card border-primary/20 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">{t("admin.dashboard.recentRaffles")}</h2>
+          <h2 className="text-xl font-bold">{t("admin.dashboard.recentDraws")}</h2>
           <Link href="/admin/lotteries">
             <Button variant="ghost" size="sm" className="text-primary">
               {t("admin.dashboard.viewAll")}
